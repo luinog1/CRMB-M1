@@ -1,0 +1,705 @@
+# CRMB Integration Reinforcement: MDBList + Client-Side TMDB
+
+## Critical Integration Requirements
+
+### 1. MDBList Integration Architecture
+**Based on Official Documentation**: MDBList provides multi-platform rating aggregation (IMDb, Trakt, TMDb, Letterboxd, RT, Metacritic) with public JSON access and API endpoints
+
+#### Implementation Strategy:
+```typescript
+// MDBList Service with Multiple Access Methods
+class MDBListService {
+  private apiKey?: string;
+  private baseUrl = 'https://mdblist.com';
+  private rapidApiUrl = 'https://mdblist.p.rapidapi.com';
+
+  // Method 1: Public JSON Access (No API Key Required)
+  async getPublicList(username: string, listSlug: string): Promise<MDBListItem[]> {
+    const url = `${this.baseUrl}/lists/${username}/${listSlug}/json/`;
+    const response = await fetch(url);
+    return response.json();
+  }
+
+  // Method 2: Official API (Requires API Key)
+  async getUserLists(): Promise<MDBList[]> {
+    if (!this.apiKey) throw new Error('API key required');
+    const response = await fetch(`${this.baseUrl}/api/lists/user`, {
+      headers: { 'X-API-Key': this.apiKey }
+    });
+    return response.json();
+  }
+
+  // Method 3: RapidAPI Integration
+  async searchWithRatings(query: string): Promise<MDBSearchResult[]> {
+    const response = await fetch(`${this.rapidApiUrl}/search?s=${encodeURIComponent(query)}`, {
+      headers: {
+        'X-RapidAPI-Key': this.rapidApiKey,
+        'X-RapidAPI-Host': 'mdblist.p.rapidapi.com'
+      }
+    });
+    return response.json();
+  }
+}
+```
+
+### 2. Client-Side TMDB Implementation
+**Based on Official TMDB Documentation**: TMDB v3 API supports both query parameter authentication and Bearer token methods
+
+#### Secure Client-Side Architecture:
+```typescript
+// TMDB Client Service with Rate Limiting
+class TMDBClientService {
+  private apiKey: string;
+  private baseUrl = 'https://api.themoviedb.org/3';
+  private imageBaseUrl: string;
+  private rateLimiter = new Map<string, number>();
+  private configCache: TMDBConfiguration | null = null;
+
+  constructor(apiKey: string) {
+    this.apiKey = apiKey;
+  }
+
+  // Rate limiting: 40 requests per 10 seconds
+  private checkRateLimit(): boolean {
+    const now = Date.now();
+    const windowStart = now - 10000; // 10 seconds
+    
+    // Clean old requests
+    for (const [timestamp, count] of this.rateLimiter.entries()) {
+      if (parseInt(timestamp) < windowStart) {
+        this.rateLimiter.delete(timestamp);
+      }
+    }
+    
+    const currentRequests = Array.from(this.rateLimiter.values()).reduce((sum, count) => sum + count, 0);
+    return currentRequests < 40;
+  }
+
+  private async makeRequest<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
+    if (!this.checkRateLimit()) {
+      throw new Error('Rate limit exceeded. Please wait before making more requests.');
+    }
+
+    const url = new URL(`${this.baseUrl}${endpoint}`);
+    url.searchParams.set('api_key', this.apiKey);
+    
+    Object.entries(params).forEach(([key, value]) => {
+      url.searchParams.set(key, value);
+    });
+
+    const response = await fetch(url.toString());
+    
+    // Track request for rate limiting
+    const timestamp = Date.now().toString();
+    this.rateLimiter.set(timestamp, 1);
+
+    if (!response.ok) {
+      throw new Error(`TMDB API Error: ${response.status} - ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  // Essential TMDB Methods
+  async getConfiguration(): Promise<TMDBConfiguration> {
+    if (this.configCache) return this.configCache;
+    
+    this.configCache = await this.makeRequest<TMDBConfiguration>('/configuration');
+    this.imageBaseUrl = this.configCache.images.secure_base_url;
+    return this.configCache;
+  }
+
+  async searchMulti(query: string): Promise<TMDBSearchResult[]> {
+    const response = await this.makeRequest<TMDBSearchResponse>('/search/multi', { query });
+    return response.results;
+  }
+
+  async getPopularMovies(page = 1): Promise<TMDBMovie[]> {
+    const response = await this.makeRequest<TMDBMovieResponse>('/movie/popular', { 
+      page: page.toString() 
+    });
+    return response.results;
+  }
+
+  async getTrendingContent(mediaType: 'movie' | 'tv' | 'all' = 'all', timeWindow: 'day' | 'week' = 'week'): Promise<TMDBTrendingResult[]> {
+    const response = await this.makeRequest<TMDBTrendingResponse>(`/trending/${mediaType}/${timeWindow}`);
+    return response.results;
+  }
+
+  // Image URL Builder with Configuration
+  buildImageUrl(path: string, size: string, type: 'poster' | 'backdrop' | 'profile' = 'poster'): string {
+    if (!this.configCache || !path) return '/placeholder-image.jpg';
+    
+    const sizeOptions = {
+      poster: this.configCache.images.poster_sizes,
+      backdrop: this.configCache.images.backdrop_sizes,
+      profile: this.configCache.images.profile_sizes
+    };
+    
+    const availableSizes = sizeOptions[type];
+    const selectedSize = availableSizes.includes(size) ? size : availableSizes[availableSizes.length - 2] || 'original';
+    
+    return `${this.imageBaseUrl}${selectedSize}${path}`;
+  }
+}
+```
+
+### 3. Enhanced Metadata Fusion Service
+```typescript
+// Unified Metadata Service combining TMDB + MDBList
+class EnhancedMetadataService {
+  private tmdb: TMDBClientService;
+  private mdblist: MDBListService;
+  private cache = new Map<string, CachedMetadata>();
+
+  constructor(tmdbApiKey: string, mdblistApiKey?: string) {
+    this.tmdb = new TMDBClientService(tmdbApiKey);
+    this.mdblist = new MDBListService(mdblistApiKey);
+  }
+
+  async getEnhancedMovieData(tmdbId: number, imdbId?: string): Promise<EnhancedMovieData> {
+    const cacheKey = `movie_${tmdbId}`;
+    
+    // Check cache first
+    if (this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey)!;
+      if (Date.now() - cached.timestamp < 1800000) { // 30 minutes
+        return cached.data;
+      }
+    }
+
+    try {
+      // Parallel fetch from both services
+      const [tmdbData, mdblistData] = await Promise.allSettled([
+        this.tmdb.getMovieDetails(tmdbId),
+        imdbId ? this.mdblist.getMovieRatings(imdbId) : Promise.resolve(null)
+      ]);
+
+      const enhancedData: EnhancedMovieData = {
+        // TMDB Core Data
+        id: tmdbData.status === 'fulfilled' ? tmdbData.value.id : tmdbId,
+        title: tmdbData.status === 'fulfilled' ? tmdbData.value.title : 'Unknown',
+        overview: tmdbData.status === 'fulfilled' ? tmdbData.value.overview : '',
+        poster_path: tmdbData.status === 'fulfilled' ? tmdbData.value.poster_path : null,
+        backdrop_path: tmdbData.status === 'fulfilled' ? tmdbData.value.backdrop_path : null,
+        release_date: tmdbData.status === 'fulfilled' ? tmdbData.value.release_date : '',
+        
+        // Enhanced MDBList Ratings
+        ratings: {
+          tmdb: tmdbData.status === 'fulfilled' ? tmdbData.value.vote_average : null,
+          imdb: mdblistData.status === 'fulfilled' && mdblistData.value ? mdblistData.value.imdb_rating : null,
+          metacritic: mdblistData.status === 'fulfilled' && mdblistData.value ? mdblistData.value.metacritic_rating : null,
+          rotten_tomatoes: mdblistData.status === 'fulfilled' && mdblistData.value ? mdblistData.value.rt_rating : null,
+          letterboxd: mdblistData.status === 'fulfilled' && mdblistData.value ? mdblistData.value.letterboxd_rating : null,
+        },
+        
+        // Image URLs with Fallbacks
+        images: this.buildImageUrls(
+          tmdbData.status === 'fulfilled' ? tmdbData.value.poster_path : null,
+          tmdbData.status === 'fulfilled' ? tmdbData.value.backdrop_path : null,
+          imdbId
+        )
+      };
+
+      // Cache the result
+      this.cache.set(cacheKey, {
+        data: enhancedData,
+        timestamp: Date.now()
+      });
+
+      return enhancedData;
+    } catch (error) {
+      console.error('Error fetching enhanced metadata:', error);
+      throw error;
+    }
+  }
+
+  private buildImageUrls(posterPath?: string, backdropPath?: string, imdbId?: string) {
+    return {
+      poster: {
+        primary: posterPath ? this.tmdb.buildImageUrl(posterPath, 'w500', 'poster') : null,
+        fallbacks: [
+          posterPath ? this.tmdb.buildImageUrl(posterPath, 'w342', 'poster') : null,
+          imdbId ? `https://img.omdbapi.com/?apikey=${process.env.OMDB_KEY}&i=${imdbId}` : null,
+          imdbId ? `https://images.metahub.space/poster/medium/${imdbId}/img` : null,
+        ].filter(Boolean)
+      },
+      backdrop: {
+        primary: backdropPath ? this.tmdb.buildImageUrl(backdropPath, 'w1280', 'backdrop') : null,
+        fallbacks: [
+          backdropPath ? this.tmdb.buildImageUrl(backdropPath, 'w780', 'backdrop') : null,
+        ].filter(Boolean)
+      }
+    };
+  }
+}
+```
+
+### 4. Integration Best Practices
+
+#### Error Handling & Fallbacks:
+```typescript
+// Robust error handling with graceful degradation
+class IntegrationErrorHandler {
+  static async withFallback<T>(
+    primary: () => Promise<T>,
+    fallbacks: Array<() => Promise<T>>,
+    defaultValue: T
+  ): Promise<T> {
+    try {
+      return await primary();
+    } catch (error) {
+      console.warn('Primary request failed, trying fallbacks:', error);
+      
+      for (const fallback of fallbacks) {
+        try {
+          return await fallback();
+        } catch (fallbackError) {
+          console.warn('Fallback failed:', fallbackError);
+        }
+      }
+      
+      return defaultValue;
+    }
+  }
+}
+```
+
+#### Performance Optimization:
+```typescript
+// Request batching and deduplication
+class RequestOptimizer {
+  private pendingRequests = new Map<string, Promise<any>>();
+  
+  async deduplicate<T>(key: string, request: () => Promise<T>): Promise<T> {
+    if (this.pendingRequests.has(key)) {
+      return this.pendingRequests.get(key);
+    }
+    
+    const promise = request().finally(() => {
+      this.pendingRequests.delete(key);
+    });
+    
+    this.pendingRequests.set(key, promise);
+    return promise;
+  }
+}
+```
+
+### 5. Complete Stremio Addon Protocol Integration
+**Based on Official Stremio SDK Documentation**: "The Stremio addon protocol defines a universal interface to describe multimedia content. It can describe catalogs, detailed metadata and streams related to multimedia content. It is typically transported over HTTP or IPFS, and follows a paradigm similar to REST."
+
+#### Full Stremio Protocol Implementation:
+```typescript
+// Complete Stremio Addon Protocol Service
+class StremioAddonService {
+  private cache = new Map<string, any>();
+  private installedAddons = new Map<string, StremioManifest>();
+
+  // Core Protocol Types
+  interface StremioManifest {
+    id: string;
+    name: string;
+    version: string;
+    description?: string;
+    logo?: string;
+    background?: string;
+    types: Array<'movie' | 'series' | 'channel' | 'tv'>;
+    resources: Array<'catalog' | 'meta' | 'stream' | 'subtitles'>;
+    catalogs: StremioCategory[];
+    idPrefixes?: string[];
+    behaviorHints?: {
+      adult?: boolean;
+      p2p?: boolean;
+      configurable?: boolean;
+      configurationRequired?: boolean;
+    };
+  }
+
+  interface StremioCategory {
+    type: 'movie' | 'series' | 'channel' | 'tv';
+    id: string;
+    name: string;
+    extra?: Array<{
+      name: string;
+      isRequired?: boolean;
+      options?: string[];
+      optionsLimit?: number;
+    }>;
+    extraSupported?: string[];
+    extraRequired?: string[];
+  }
+
+  // 1. CATALOG Resource Implementation
+  async getCatalogFromAddon(
+    addonUrl: string, 
+    type: string, 
+    id: string, 
+    extra: Record<string, string> = {}
+  ): Promise<StremioMetaPreview[]> {
+    const cacheKey = `catalog_${addonUrl}_${type}_${id}_${JSON.stringify(extra)}`;
+    
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey);
+    }
+
+    try {
+      // Build catalog URL with extra parameters
+      let catalogUrl = `${addonUrl.replace(/\/$/, '')}/catalog/${type}/${id}.json`;
+      
+      if (Object.keys(extra).length > 0) {
+        const extraParams = Object.entries(extra)
+          .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+          .join('&');
+        catalogUrl = `${addonUrl.replace(/\/$/, '')}/catalog/${type}/${id}/${extraParams}.json`;
+      }
+
+      const response = await fetch(catalogUrl, {
+        timeout: 15000,
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'CRMB-WebApp/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Catalog request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const metas = data.metas || [];
+      
+      // Cache for 1 hour
+      setTimeout(() => this.cache.delete(cacheKey), 3600000);
+      this.cache.set(cacheKey, metas);
+      
+      return metas;
+    } catch (error) {
+      console.error(`Failed to fetch catalog from ${addonUrl}:`, error);
+      return [];
+    }
+  }
+
+  // 2. META Resource Implementation
+  async getMetaFromAddon(
+    addonUrl: string, 
+    type: string, 
+    id: string
+  ): Promise<StremioMetaDetail | null> {
+    const cacheKey = `meta_${addonUrl}_${type}_${id}`;
+    
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey);
+    }
+
+    try {
+      const metaUrl = `${addonUrl.replace(/\/$/, '')}/meta/${type}/${id}.json`;
+      
+      const response = await fetch(metaUrl, {
+        timeout: 10000,
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'CRMB-WebApp/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Meta request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const meta = data.meta;
+      
+      // Cache for 30 minutes
+      setTimeout(() => this.cache.delete(cacheKey), 1800000);
+      this.cache.set(cacheKey, meta);
+      
+      return meta;
+    } catch (error) {
+      console.error(`Failed to fetch meta from ${addonUrl}:`, error);
+      return null;
+    }
+  }
+
+  // 3. STREAM Resource Implementation
+  async getStreamsFromAddon(
+    addonUrl: string, 
+    type: string, 
+    id: string
+  ): Promise<StremioStream[]> {
+    try {
+      const streamUrl = `${addonUrl.replace(/\/$/, '')}/stream/${type}/${id}.json`;
+      
+      const response = await fetch(streamUrl, {
+        timeout: 10000,
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'CRMB-WebApp/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Stream request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.streams || [];
+    } catch (error) {
+      console.error(`Failed to fetch streams from ${addonUrl}:`, error);
+      return [];
+    }
+  }
+
+  // 4. SUBTITLES Resource Implementation
+  async getSubtitlesFromAddon(
+    addonUrl: string, 
+    type: string, 
+    id: string
+  ): Promise<StremioSubtitle[]> {
+    try {
+      const subtitleUrl = `${addonUrl.replace(/\/$/, '')}/subtitles/${type}/${id}.json`;
+      
+      const response = await fetch(subtitleUrl, {
+        timeout: 8000,
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'CRMB-WebApp/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        return []; // Subtitles are optional
+      }
+
+      const data = await response.json();
+      return data.subtitles || [];
+    } catch (error) {
+      console.warn(`Failed to fetch subtitles from ${addonUrl}:`, error);
+      return [];
+    }
+  }
+
+  // Popular Community Addons Integration
+  async loadPopularAddons(): Promise<void> {
+    const popularAddons = [
+      // Official Addons
+      {
+        name: 'Cinemeta',
+        url: 'https://v3-cinemeta.strem.io',
+        description: 'Official TMDB metadata provider'
+      },
+      {
+        name: 'OpenSubtitles',
+        url: 'https://opensubtitles-v3.strem.io',
+        description: 'Subtitle provider from OpenSubtitles'
+      },
+      {
+        name: 'YouTube',
+        url: 'https://youtube.strem.io',
+        description: 'YouTube content integration'
+      },
+      // Community Addons (Popular from stremio-addons.com)
+      {
+        name: 'Torrentio',
+        url: 'https://torrentio.strem.fun',
+        description: 'Torrent and Debrid addon with multiple sources'
+      },
+      {
+        name: 'ThePirateBay+',
+        url: 'https://thepiratebay-plus.strem.fun',
+        description: 'Enhanced TPB integration'
+      },
+      {
+        name: 'Streaming Catalogs',
+        url: 'https://1fe84bc728af-streamingcatalogs.baby-beamup.club',
+        description: 'Platform availability catalogs (Netflix, HBO, etc.)'
+      }
+    ];
+
+    // Load manifests for all popular addons
+    await Promise.allSettled(
+      popularAddons.map(async (addon) => {
+        try {
+          const manifest = await this.getAddonManifest(addon.url);
+          if (manifest) {
+            this.installedAddons.set(addon.url, manifest);
+          }
+        } catch (error) {
+          console.warn(`Failed to load addon ${addon.name}:`, error);
+        }
+      })
+    );
+  }
+
+  // Addon Management
+  async installAddon(addonUrl: string): Promise<StremioManifest> {
+    const manifest = await this.getAddonManifest(addonUrl);
+    if (!manifest) {
+      throw new Error('Invalid addon or manifest not found');
+    }
+
+    this.installedAddons.set(addonUrl, manifest);
+    
+    // Save to localStorage for persistence
+    const savedAddons = JSON.parse(localStorage.getItem('installedAddons') || '{}');
+    savedAddons[addonUrl] = manifest;
+    localStorage.setItem('installedAddons', JSON.stringify(savedAddons));
+
+    return manifest;
+  }
+
+  async getAddonManifest(addonUrl: string): Promise<StremioManifest | null> {
+    try {
+      const manifestUrl = `${addonUrl.replace(/\/$/, '')}/manifest.json`;
+      
+      const response = await fetch(manifestUrl, {
+        timeout: 10000,
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'CRMB-WebApp/1.0'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Manifest request failed: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error(`Failed to fetch manifest from ${addonUrl}:`, error);
+      return null;
+    }
+  }
+
+  // Unified Content Aggregation
+  async aggregateContent(type: 'movie' | 'series', catalogId: string = 'popular'): Promise<StremioMetaPreview[]> {
+    const allContent: StremioMetaPreview[] = [];
+    const promises: Promise<StremioMetaPreview[]>[] = [];
+
+    // Gather content from all installed addons
+    for (const [addonUrl, manifest] of this.installedAddons.entries()) {
+      if (manifest.types.includes(type) && manifest.resources.includes('catalog')) {
+        const relevantCatalogs = manifest.catalogs.filter(cat => cat.type === type);
+        
+        for (const catalog of relevantCatalogs) {
+          if (catalog.id === catalogId || catalogId === 'all') {
+            promises.push(this.getCatalogFromAddon(addonUrl, type, catalog.id));
+          }
+        }
+      }
+    }
+
+    // Execute all requests in parallel
+    const results = await Promise.allSettled(promises);
+    
+    results.forEach(result => {
+      if (result.status === 'fulfilled') {
+        allContent.push(...result.value);
+      }
+    });
+
+    // Deduplicate by IMDb ID or name
+    const unique = new Map<string, StremioMetaPreview>();
+    allContent.forEach(item => {
+      const key = item.imdb_id || item.name;
+      if (key && !unique.has(key)) {
+        unique.set(key, item);
+      }
+    });
+
+    return Array.from(unique.values());
+  }
+}
+
+// Integration with Enhanced Metadata Service
+class UnifiedContentService {
+  private tmdb: TMDBClientService;
+  private mdblist: MDBListService;
+  private stremio: StremioAddonService;
+
+  constructor(tmdbApiKey: string, mdblistApiKey?: string) {
+    this.tmdb = new TMDBClientService(tmdbApiKey);
+    this.mdblist = new MDBListService(mdblistApiKey);
+    this.stremio = new StremioAddonService();
+  }
+
+  async initialize() {
+    // Load popular Stremio addons
+    await this.stremio.loadPopularAddons();
+  }
+
+  async getUnifiedCatalog(type: 'movie' | 'series', source: 'tmdb' | 'stremio' | 'mdblist' = 'tmdb'): Promise<UnifiedContent[]> {
+    switch (source) {
+      case 'tmdb':
+        const tmdbContent = type === 'movie' 
+          ? await this.tmdb.getPopularMovies()
+          : await this.tmdb.getPopularTVShows();
+        return tmdbContent.map(this.mapTMDBToUnified);
+        
+      case 'stremio':
+        const stremioContent = await this.stremio.aggregateContent(type, 'popular');
+        return stremioContent.map(this.mapStremioToUnified);
+        
+      case 'mdblist':
+        // Implementation for MDBList catalogs
+        return [];
+        
+      default:
+        return [];
+    }
+  }
+
+  async getEnhancedContent(id: string, type: 'movie' | 'series'): Promise<EnhancedContent> {
+    // Parallel fetch from all sources
+    const [tmdbData, stremioMeta, mdblistData] = await Promise.allSettled([
+      this.tmdb.getMovieDetails(parseInt(id)),
+      this.stremio.getMetaFromAddon('https://v3-cinemeta.strem.io', type, id),
+      this.mdblist.getMovieRatings(id)
+    ]);
+
+    // Combine all metadata
+    return this.combineMetadata(tmdbData, stremioMeta, mdblistData);
+  }
+}
+```
+
+### 6. Popular Addon Integration Examples
+Based on community recommendations from stremio-addons.com and curated lists showing popular addons like "Orion: Torrent and Debrid addon", "Torrentio: Torrent and Debrid addon with multiple sources", and "Deflix: Debrid addon with multiple sources":
+
+```typescript
+// Pre-configured Popular Addons
+const POPULAR_STREMIO_ADDONS = {
+  official: [
+    {
+      name: 'Cinemeta',
+      url: 'https://v3-cinemeta.strem.io',
+      types: ['movie', 'series'],
+      resources: ['catalog', 'meta'],
+      description: 'Official TMDB metadata provider'
+    },
+    {
+      name: 'OpenSubtitles',
+      url: 'https://opensubtitles-v3.strem.io', 
+      resources: ['subtitles'],
+      description: 'Subtitle provider'
+    }
+  ],
+  community: [
+    {
+      name: 'Streaming Catalogs',
+      url: 'https://1fe84bc728af-streamingcatalogs.baby-beamup.club',
+      description: 'Platform availability tracking (Netflix, HBO, Disney+, etc.)'
+    },
+    {
+      name: 'IMDB Catalogs', 
+      url: 'https://v3-imdb-catalogs.strem.io',
+      description: 'IMDB Top lists and ratings integration'
+    },
+    {
+      name: 'Trakt.tv Integration',
+      url: 'https://trakt.strem.fun',
+      description: 'Personal Trakt.tv watchlists and recommendations'
+    }
+  ]
+};
+```
