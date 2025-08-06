@@ -1,0 +1,460 @@
+{
+  "project_name": "CRMB Streaming WebApp",
+  "description": "Modern, high-performance media center web application with Apple TV+/Netflix-inspired aesthetics, comprehensive metadata integration, and Stremio addon protocol support",
+  "version": "2.0.0",
+  "technology_stack": {
+    "frontend": {
+      "framework": "React 18+",
+      "language": "TypeScript",
+      "build_tool": "Vite",
+      "styling": "Custom CSS with CSS Grid, Flexbox, and CSS Variables",
+      "state_management": "React Context + useReducer",
+      "image_optimization": ["WebP", "AVIF", "JPEG fallbacks"]
+    },
+    "backend": {
+      "language": "Rust",
+      "framework": "Axum",
+      "http_client": "reqwest with connection pooling",
+      "serialization": "serde with serde_json",
+      "error_handling": ["anyhow", "thiserror"],
+      "logging": ["tracing", "tracing-subscriber"]
+    }
+  },
+  "metadata_integration": {
+    "tmdb": {
+      "purpose": "Primary metadata source for movies, TV shows, actors, and images",
+      "base_url": "https://api.themoviedb.org/3",
+      "image_base_url": "https://image.tmdb.org/t/p/",
+      "authentication": "API key via query parameter or Bearer token",
+      "rate_limit": "40 requests per 10 seconds",
+      "endpoints": [
+        "/configuration",
+        "/movie/popular",
+        "/movie/upcoming",
+        "/movie/now_playing",
+        "/movie/{movie_id}",
+        "/movie/{movie_id}/videos",
+        "/search/movie",
+        "/search/multi",
+        "/trending/{media_type}/{time_window}"
+      ],
+      "image_sizes": {
+        "poster": ["w92", "w154", "w185", "w342", "w500", "w780", "original"],
+        "backdrop": ["w300", "w780", "w1280", "original"],
+        "profile": ["w45", "w185", "h632", "original"]
+      }
+    },
+    "stremio": {
+      "protocol": "Stremio Addon Protocol v1.0",
+      "purpose": "Universal interface for multimedia content over HTTP",
+      "content_types": ["movie", "series", "channel", "tv"],
+      "resources": ["catalog", "meta", "stream", "subtitles"],
+      "builtin_cinemeta": {
+        "url": "https://v3-cinemeta.strem.io",
+        "description": "Stremio's official TMDB addon for fallback metadata"
+      },
+      "endpoints": {
+        "manifest": "{addon_base_url}/manifest.json",
+        "catalog": "{addon_base_url}/catalog/{type}/{id}.json",
+        "meta": "{addon_base_url}/meta/{type}/{id}.json",
+        "stream": "{addon_base_url}/stream/{type}/{id}.json",
+        "subtitles": "{addon_base_url}/subtitles/{type}/{id}.json"
+      }
+    },
+    "mdblist": {
+      "purpose": "Multi-platform rating aggregation and custom list management",
+      "base_url": "https://mdblist.com/api",
+      "authentication": "X-API-Key header",
+      "features": [
+        "Multi-platform ratings (IMDb, TMDb, Letterboxd, RT, Metacritic)",
+        "Personal list imports and synchronization",
+        "Trakt.tv integration",
+        "Advanced filtering and sorting",
+        "RPDB integration for enhanced rating posters"
+      ],
+      "endpoints": [
+        "/lists/user",
+        "/lists/{list_id}/items",
+        "/search",
+        "/ratings/{imdb_id}"
+      ]
+    },
+    "unified_service_architecture": {
+      "primary_source": "TMDB",
+      "fallback_chain": ["TMDB", "Cinemeta", "OMDb", "Generated Placeholder"],
+      "caching_strategy": "Multi-tier (memory + browser + CDN headers)",
+      "request_deduplication": "Intelligent batching and caching",
+      "metadata_enrichment": "Cross-reference TMDB, MDBList, and addon data"
+    }
+  },
+  "core_features": {
+    "hero_banner": {
+      "description": "Dynamic TMDB backdrop with gradient overlay",
+      "features": [
+        "Smooth fade transitions between content",
+        "Play button with hover animations",
+        "Responsive typography scaling",
+        "Lazy-loaded high-resolution images"
+      ]
+    },
+    "content_carousels": {
+      "description": "Horizontal scrolling with momentum and touch support",
+      "categories": ["Popular", "Upcoming", "Trending", "Watchlist", "Custom Lists"],
+      "features": [
+        "Touch/swipe support for mobile",
+        "Lazy loading for performance",
+        "Smooth CSS transforms for navigation",
+        "Infinite scroll capabilities"
+      ]
+    },
+    "real_time_search": {
+      "description": "Debounced search with TMDB multi-search integration",
+      "features": [
+        "300ms debounce delay",
+        "Expandable search bar with animations",
+        "Search result cards with poster thumbnails",
+        "Mobile-optimized keyboard handling",
+        "Search across movies, TV shows, and people"
+      ]
+    },
+    "catalog_management": {
+      "description": "Unified catalog system supporting multiple sources",
+      "builtin_catalogs": [
+        "TMDB Popular Movies/TV",
+        "TMDB Trending Content",
+        "TMDB Upcoming Releases",
+        "Cinemeta Top Movies/Series"
+      ],
+      "custom_sources": [
+        "Stremio addon integration",
+        "MDBList personal lists",
+        "User-defined catalogs"
+      ]
+    },
+    "image_optimization": {
+      "formats": ["WebP", "AVIF", "JPEG"],
+      "loading_strategy": "Progressive with blur-up technique",
+      "fallback_system": [
+        "Primary TMDB image",
+        "OMDb API fallback",
+        "Cinemeta fallback",
+        "Generated placeholder"
+      ],
+      "performance": [
+        "Lazy loading",
+        "Aspect ratio containers",
+        "Loading states and skeletons"
+      ]
+    },
+    "user_experience": {
+      "watchlist": "Personal watchlist with local persistence",
+      "progress_tracking": "Watch progress across sessions",
+      "favorites": "Favorites management with sync",
+      "theme": "Dark theme with customizable accents",
+      "responsive": "Mobile-first responsive design"
+    }
+  },
+  "environment_configuration": {
+    "frontend_env": {
+      "VITE_TMDB_API_KEY": "your_tmdb_api_key_here",
+      "VITE_TMDB_BASE_URL": "https://api.themoviedb.org/3",
+      "VITE_TMDB_IMAGE_BASE_URL": "https://image.tmdb.org/t/p/",
+      "VITE_API_URL": "http://localhost:3001/api",
+      "VITE_MDBLIST_ENABLED": "true",
+      "VITE_CINEMETA_URL": "https://v3-cinemeta.strem.io",
+      "VITE_ENABLE_WEBP": "true",
+      "VITE_ENABLE_AVIF": "true"
+    },
+    "backend_env": {
+      "RUST_ENV": "development",
+      "PORT": "3001",
+      "CORS_ORIGIN": "http://localhost:3000",
+      "TMDB_API_KEY": "your_tmdb_api_key_here",
+      "TMDB_BASE_URL": "https://api.themoviedb.org/3",
+      "TMDB_IMAGE_BASE_URL": "https://image.tmdb.org/t/p/",
+      "RATE_LIMIT_WINDOW": "600000",
+      "RATE_LIMIT_MAX": "40",
+      "CACHE_TTL_CONFIGURATION": "86400",
+      "CACHE_TTL_CATALOG": "3600",
+      "CACHE_TTL_METADATA": "1800",
+      "DATABASE_URL": "sqlite://./data/crmb.db",
+      "JWT_SECRET": "your_jwt_secret_for_user_sessions",
+      "ALLOWED_ADDON_DOMAINS": "strem.io,stremio.com,cinemeta.strem.io"
+    }
+  },
+  "performance_targets": {
+    "lighthouse": {
+      "performance": 90,
+      "accessibility": 95,
+      "best_practices": 90,
+      "seo": 85
+    },
+    "core_web_vitals": {
+      "lcp": "< 2.5s",
+      "fid": "< 100ms",
+      "cls": "< 0.1"
+    },
+    "bundle_optimization": {
+      "total_size": "< 250KB gzipped",
+      "lazy_chunks": "< 100KB",
+      "image_formats": ["WebP", "AVIF", "JPEG fallback"]
+    },
+    "loading_performance": {
+      "initial_load": "< 3s on 3G networks",
+      "image_loading": "Progressive with blur-up",
+      "animations": "60fps smooth transitions"
+    }
+  },
+  "ui_ux_design": {
+    "visual_design": {
+      "theme": "Dark",
+      "primary_colors": ["#0a0a0a", "#1a1a1a"],
+      "accent_color": "#84cc16",
+      "typography": "Modern sans-serif with proper hierarchy",
+      "spacing": "Consistent 8px grid system"
+    },
+    "layout_structure": {
+      "sidebar": "Left-aligned with icons (Home, Search, Watchlist, Settings)",
+      "main_content": "Hero banner + horizontal carousels",
+      "responsive_breakpoints": {
+        "mobile": "< 768px (single column, bottom navigation)",
+        "tablet": "768px - 1024px (collapsible sidebar)",
+        "desktop": "> 1024px (full sidebar, multi-column carousels)"
+      }
+    },
+    "animations": {
+      "transitions": "60fps smooth transitions",
+      "hover_effects": "Scale and opacity changes",
+      "loading_states": "Skeleton screens and progress indicators",
+      "motion_preferences": "Respectful of reduced motion settings"
+    }
+  },
+  "api_architecture": {
+    "rate_limiting": {
+      "tmdb_compliance": "40 requests per 10 seconds",
+      "server_side_enforcement": true,
+      "client_side_throttling": true
+    },
+    "caching_strategy": {
+      "levels": ["Memory cache", "Browser cache", "CDN headers"],
+      "ttl_values": {
+        "configuration": 86400,
+        "catalog": 3600,
+        "metadata": 1800,
+        "images": 604800
+      }
+    },
+    "error_handling": {
+      "retry_logic": "Exponential backoff",
+      "fallback_services": "Multiple metadata sources",
+      "graceful_degradation": "Show cached content on errors"
+    },
+    "security": {
+      "api_key_storage": "Environment variables only",
+      "cors_validation": "Strict origin validation",
+      "input_sanitization": "All user inputs validated",
+      "error_messages": "No sensitive data exposure"
+    }
+  },
+  "development_phases": {
+    "phase_1_foundation": {
+      "tasks": [
+        "Project scaffolding with Vite + React + TypeScript",
+        "Rust backend with Axum server setup",
+        "TMDB API integration and proxy endpoints",
+        "Basic routing and layout structure",
+        "Dark theme implementation with CSS variables"
+      ],
+      "duration": "1-2 weeks",
+      "deliverables": ["Basic app structure", "TMDB integration", "Dark theme"]
+    },
+    "phase_2_core_components": {
+      "tasks": [
+        "Hero banner with dynamic content",
+        "Reusable carousel component with touch support",
+        "Search functionality with real-time results",
+        "Movie/TV show detail pages",
+        "Local storage integration for user data"
+      ],
+      "duration": "2-3 weeks",
+      "deliverables": ["Core UI components", "Search system", "Detail views"]
+    },
+    "phase_3_advanced_features": {
+      "tasks": [
+        "Stremio addon protocol implementation",
+        "MDBList integration and custom lists",
+        "Watchlist and progress tracking",
+        "Performance optimizations (lazy loading, code splitting)",
+        "Advanced image optimization pipeline"
+      ],
+      "duration": "2-3 weeks",
+      "deliverables": ["Addon system", "User features", "Performance optimizations"]
+    },
+    "phase_4_polish_optimization": {
+      "tasks": [
+        "Animation refinements and micro-interactions",
+        "Accessibility improvements (ARIA labels, keyboard navigation)",
+        "SEO optimization with meta tags",
+        "Bundle analysis and size optimization",
+        "Cross-browser testing and compatibility"
+      ],
+      "duration": "1-2 weeks",
+      "deliverables": ["Production-ready app", "Accessibility compliance", "Performance optimization"]
+    }
+  },
+  "testing_strategy": {
+    "unit_tests": {
+      "framework": "Jest + React Testing Library",
+      "coverage": "Component logic and API utilities",
+      "target_coverage": "> 80%"
+    },
+    "integration_tests": {
+      "framework": "Cypress or Playwright",
+      "coverage": "API endpoints and data flow",
+      "critical_paths": ["Search", "Catalog loading", "Metadata fetching"]
+    },
+    "e2e_tests": {
+      "framework": "Playwright",
+      "coverage": "Critical user journeys",
+      "scenarios": ["First visit", "Search flow", "Watchlist management"]
+    },
+    "performance_tests": {
+      "tools": ["Lighthouse CI", "WebPageTest", "Bundle Analyzer"],
+      "metrics": ["Bundle size", "Load times", "Core Web Vitals"]
+    },
+    "accessibility_tests": {
+      "tools": ["axe-core", "Screen readers", "Keyboard navigation"],
+      "compliance": "WCAG 2.1 AA"
+    }
+  },
+  "deployment_configuration": {
+    "containerization": {
+      "frontend": "Docker with Nginx",
+      "backend": "Docker with Rust binary",
+      "database": "SQLite or PostgreSQL"
+    },
+    "environment_management": {
+      "development": "Local with hot reload",
+      "staging": "Preview deployments",
+      "production": "Optimized builds with CDN"
+    },
+    "monitoring": {
+      "logging": "Structured logs with tracing",
+      "metrics": "Performance and error tracking",
+      "alerts": "Critical error notifications"
+    }
+  },
+  "quality_assurance": {
+    "code_quality": {
+      "typescript": "Strict TypeScript configuration",
+      "rust": "Clippy + rustfmt for backend code",
+      "linting": "ESLint + Prettier",
+      "git_hooks": "Pre-commit validation"
+    },
+    "documentation": {
+      "api_docs": "OpenAPI/Swagger specification",
+      "component_docs": "Storybook for UI components",
+      "deployment_guide": "Step-by-step deployment instructions"
+    }
+  },
+  "success_metrics": {
+    "performance": "Sub-3-second load times on 3G networks",
+    "user_experience": "Smooth 60fps animations across devices",
+    "reliability": "99.9% uptime with graceful error handling",
+    "accessibility": "WCAG 2.1 AA compliance",
+    "mobile_experience": "Touch-optimized interactions"
+  },
+  "dependencies": {
+    "frontend": {
+      "core": [
+        "react@^18.0.0",
+        "react-dom@^18.0.0",
+        "typescript@^5.0.0",
+        "@types/react@^18.0.0",
+        "@types/react-dom@^18.0.0"
+      ],
+      "build_tools": [
+        "vite@^4.0.0",
+        "@vitejs/plugin-react@^4.0.0"
+      ],
+      "utilities": [
+        "react-router-dom@^6.0.0",
+        "axios@^1.0.0",
+        "date-fns@^2.0.0"
+      ],
+      "dev_dependencies": [
+        "eslint@^8.0.0",
+        "prettier@^3.0.0",
+        "@testing-library/react@^14.0.0",
+        "@testing-library/jest-dom@^6.0.0"
+      ]
+    },
+    "backend": {
+      "core": [
+        "axum = \"0.7\"",
+        "tokio = { version = \"1.0\", features = [\"full\"] }",
+        "reqwest = { version = \"0.11\", features = [\"json\"] }",
+        "serde = { version = \"1.0\", features = [\"derive\"] }",
+        "serde_json = \"1.0\""
+      ],
+      "utilities": [
+        "anyhow = \"1.0\"",
+        "thiserror = \"1.0\"",
+        "tracing = \"0.1\"",
+        "tracing-subscriber = \"0.3\"",
+        "tower = \"0.4\"",
+        "tower-http = { version = \"0.4\", features = [\"cors\", \"fs\"] }",
+        "dashmap = \"5.0\"",
+        "uuid = { version = \"1.0\", features = [\"v4\"] }",
+        "sqlx = { version = \"0.7\", features = [\"runtime-tokio-rustls\", \"sqlite\"] }"
+      ]
+    }
+  },
+  "documentation_references": {
+    "tmdb_api": "https://developers.themoviedb.org/3",
+    "stremio_addon_sdk": "https://github.com/Stremio/stremio-addon-sdk",
+    "mdblist_api": "https://mdblist.com/api/",
+    "react_documentation": "https://react.dev/",
+    "rust_axum": "https://docs.rs/axum/latest/axum/",
+    "web_accessibility": "https://www.w3.org/WAI/WCAG21/quickref/"
+  },
+  "pre_development_checklist": [
+    "Obtain TMDB API key from https://www.themoviedb.org/settings/api",
+    "Validate TMDB API with test requests",
+    "Install Rust toolchain (latest stable)",
+    "Install Node.js (LTS version) and npm/yarn",
+    "Set up development environment with TypeScript/Rust IDE plugins",
+    "Optional: Obtain MDBList API key for enhanced features",
+    "Prepare test content and fallback images",
+    "Set up version control with Git",
+    "Configure development database (SQLite for local development)"
+  ],
+  "deliverables": [
+    "React/TypeScript frontend with modern UI",
+    "Rust backend with comprehensive API proxy",
+    "Responsive dark theme with smooth animations",
+    "Advanced search and catalog components",
+    "Complete Stremio addon protocol support",
+    "MDBList integration for enhanced metadata",
+    "Local watchlist with persistence and sync",
+    "Performance-optimized image loading system",
+    "Comprehensive error handling and fallbacks",
+    "Complete project structure and documentation",
+    "Docker configuration for deployment",
+    "Testing suite (unit/integration/e2e)",
+    "Accessibility compliance (WCAG 2.1 AA)",
+    "Production deployment guide"
+  ],
+  "enhanced_features": {
+    "metadata_enrichment": "Cross-platform rating aggregation and enhanced posters",
+    "addon_ecosystem": "Support for community-created Stremio addons",
+    "offline_capabilities": "Cached content for offline browsing",
+    "personalization": "AI-driven content recommendations based on viewing history",
+    "social_features": "Share watchlists and ratings with friends",
+    "advanced_filtering": "Filter by genre, year, rating, platform availability",
+    "export_import": "Import/export watchlists from other platforms",
+    "keyboard_shortcuts": "Power user keyboard navigation",
+    "themes": "Multiple color themes and customization options",
+    "analytics": "Privacy-focused usage analytics and recommendations"
+  }
+}
