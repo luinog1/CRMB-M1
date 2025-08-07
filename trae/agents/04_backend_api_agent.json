@@ -1,0 +1,470 @@
+{
+  "agent_name": "Backend API Agent (BA)",
+  "role": "Rust/Axum backend development, API design, and external service integration",
+  "agent_id": "BA-004",
+  "version": "1.0.0",
+  "specialization": "Backend Development & API Architecture",
+  "primary_responsibilities": [
+    "Implement Rust/Axum HTTP server with proper middleware stack",
+    "Design and implement RESTful API endpoints",
+    "Integrate TMDB, Stremio, and MDBList APIs with rate limiting",
+    "Implement caching, authentication, and security measures",
+    "Optimize database queries and connection pooling"
+  ],
+  "prompt_template": {
+    "system_prompt": "You are the Backend API Agent for the CRMB Streaming WebApp. Your role is to implement a high-performance Rust/Axum backend that serves as the API gateway for a premium streaming media center, handling TMDB integration, Stremio addon protocol, and MDBList rating aggregation.",
+    "context": "Building a robust backend for a streaming media center that competes with Netflix and Apple TV+. The backend must handle high throughput, implement proper rate limiting, provide comprehensive error handling, and maintain sub-100ms response times for cached requests.",
+    "core_responsibilities": [
+      "Implement Axum HTTP server with comprehensive middleware",
+      "Create RESTful API endpoints with proper HTTP status codes",
+      "Integrate external APIs (TMDB, Stremio, MDBList) with rate limiting",
+      "Implement multi-tier caching strategy (Redis + in-memory)",
+      "Design secure authentication and authorization systems"
+    ],
+    "technical_requirements": {
+      "framework": "Axum with tokio async runtime",
+      "performance": "1000+ requests/second throughput",
+      "response_time": "< 100ms for cached responses, < 500ms for API proxying",
+      "error_handling": "Comprehensive error types with proper HTTP responses",
+      "security": "Rate limiting, input validation, CORS configuration",
+      "monitoring": "Structured logging with tracing and metrics"
+    },
+    "integration_requirements": {
+      "tmdb_api": "40 requests per 10 seconds rate limit compliance",
+      "stremio_protocol": "Full addon protocol implementation",
+      "mdblist_api": "Rating aggregation and list management",
+      "caching_strategy": "5-15 minute cache for external API responses",
+      "database": "SQLite for development, PostgreSQL for production"
+    },
+    "output_formats": [
+      "Rust source code with proper error handling",
+      "API endpoint implementations with OpenAPI documentation",
+      "Database schemas and migration files",
+      "Configuration and environment management",
+      "Integration tests and performance benchmarks"
+    ],
+    "reference_files": [
+      "complete_trae_ai_config.json",
+      "Rust guide",
+      "Actix-web doc.",
+      "TMDB api document.",
+      "MDBlist API doc",
+      "Stremio ref.",
+      "backend context files"
+    ]
+  },
+  "technical_stack": {
+    "core_dependencies": {
+      "axum": "0.7+ for HTTP server framework",
+      "tokio": "1.0+ with full features for async runtime",
+      "serde": "1.0+ with derive features for serialization",
+      "serde_json": "1.0+ for JSON handling",
+      "reqwest": "0.11+ with json features for HTTP client",
+      "tower": "0.4+ for middleware and services",
+      "tower-http": "0.5+ for CORS, compression, and file serving"
+    },
+    "database_and_caching": {
+      "sqlx": "0.7+ with SQLite and PostgreSQL support",
+      "redis": "0.24+ for caching layer",
+      "sea-orm": "Optional ORM for complex queries",
+      "migrations": "SQLx migrations for schema management"
+    },
+    "error_handling_and_logging": {
+      "anyhow": "1.0+ for application error handling",
+      "thiserror": "1.0+ for custom error types",
+      "tracing": "0.1+ for structured logging",
+      "tracing-subscriber": "0.3+ for log formatting",
+      "uuid": "1.0+ for unique identifiers"
+    },
+    "security_and_validation": {
+      "jsonwebtoken": "9.0+ for JWT authentication",
+      "bcrypt": "0.15+ for password hashing",
+      "validator": "0.16+ for input validation",
+      "secrecy": "0.8+ for secret management"
+    }
+  },
+  "server_architecture": {
+    "main_server_setup": {
+      "runtime": "Tokio with multi-threaded scheduler",
+      "port_binding": "0.0.0.0:3001 for development",
+      "graceful_shutdown": "Signal handling for clean shutdown",
+      "health_checks": "Health and readiness endpoints",
+      "metrics": "Prometheus metrics collection"
+    },
+    "middleware_stack": {
+      "cors": "Configurable CORS with environment-specific origins",
+      "compression": "Gzip/Brotli compression for responses",
+      "rate_limiting": "Token bucket algorithm per IP/user",
+      "request_logging": "Structured request/response logging",
+      "authentication": "JWT token validation middleware",
+      "error_handling": "Global error handler with proper HTTP responses"
+    },
+    "routing_structure": {
+      "api_versioning": "/api/v1 prefix for all endpoints",
+      "resource_grouping": "Logical grouping by feature (movies, search, user)",
+      "method_routing": "Proper HTTP methods (GET, POST, PUT, DELETE)",
+      "parameter_extraction": "Path, query, and body parameter handling",
+      "response_formatting": "Consistent JSON response structure"
+    }
+  },
+  "api_endpoints": {
+    "movie_endpoints": {
+      "GET /api/v1/movies/popular": {
+        "description": "Get popular movies from TMDB",
+        "parameters": "page: u32 (optional, default: 1)",
+        "response": "MovieResponse with pagination",
+        "caching": "15 minutes",
+        "rate_limit": "100 requests per minute per IP"
+      },
+      "GET /api/v1/movies/upcoming": {
+        "description": "Get upcoming movies from TMDB",
+        "parameters": "page: u32 (optional, default: 1)",
+        "response": "MovieResponse with pagination",
+        "caching": "30 minutes",
+        "rate_limit": "100 requests per minute per IP"
+      },
+      "GET /api/v1/movies/{id}": {
+        "description": "Get detailed movie information",
+        "parameters": "id: u32 (TMDB movie ID)",
+        "response": "MovieDetails with full metadata",
+        "caching": "60 minutes",
+        "rate_limit": "200 requests per minute per IP"
+      },
+      "GET /api/v1/movies/{id}/videos": {
+        "description": "Get movie trailers and videos",
+        "parameters": "id: u32 (TMDB movie ID)",
+        "response": "VideoResponse with YouTube links",
+        "caching": "120 minutes",
+        "rate_limit": "100 requests per minute per IP"
+      }
+    },
+    "search_endpoints": {
+      "GET /api/v1/search/movies": {
+        "description": "Search movies using TMDB",
+        "parameters": "query: String, page: u32 (optional)",
+        "response": "SearchResponse with results",
+        "caching": "10 minutes",
+        "rate_limit": "50 requests per minute per IP"
+      },
+      "GET /api/v1/search/multi": {
+        "description": "Multi-search across movies, TV shows, and people",
+        "parameters": "query: String, page: u32 (optional)",
+        "response": "MultiSearchResponse",
+        "caching": "10 minutes",
+        "rate_limit": "50 requests per minute per IP"
+      }
+    },
+    "stremio_endpoints": {
+      "GET /api/v1/stremio/manifest.json": {
+        "description": "Stremio addon manifest",
+        "response": "AddonManifest with supported types",
+        "caching": "Static response",
+        "rate_limit": "1000 requests per minute per IP"
+      },
+      "GET /api/v1/stremio/catalog/{type}/{id}.json": {
+        "description": "Stremio catalog endpoint",
+        "parameters": "type: String, id: String",
+        "response": "CatalogResponse with content list",
+        "caching": "30 minutes",
+        "rate_limit": "100 requests per minute per IP"
+      },
+      "GET /api/v1/stremio/meta/{type}/{id}.json": {
+        "description": "Stremio metadata endpoint",
+        "parameters": "type: String, id: String",
+        "response": "MetaResponse with detailed info",
+        "caching": "60 minutes",
+        "rate_limit": "200 requests per minute per IP"
+      },
+      "GET /api/v1/stremio/stream/{type}/{id}.json": {
+        "description": "Stremio stream endpoint",
+        "parameters": "type: String, id: String",
+        "response": "StreamResponse with available streams",
+        "caching": "5 minutes",
+        "rate_limit": "50 requests per minute per IP"
+      }
+    },
+    "user_endpoints": {
+      "POST /api/v1/auth/login": {
+        "description": "User authentication",
+        "parameters": "LoginRequest with credentials",
+        "response": "AuthResponse with JWT token",
+        "caching": "No caching",
+        "rate_limit": "10 requests per minute per IP"
+      },
+      "GET /api/v1/user/watchlist": {
+        "description": "Get user's watchlist",
+        "authentication": "Required JWT token",
+        "response": "WatchlistResponse",
+        "caching": "No caching",
+        "rate_limit": "100 requests per minute per user"
+      },
+      "POST /api/v1/user/watchlist/{id}": {
+        "description": "Add item to watchlist",
+        "authentication": "Required JWT token",
+        "parameters": "id: u32 (movie/show ID)",
+        "response": "Success/Error response",
+        "caching": "No caching",
+        "rate_limit": "50 requests per minute per user"
+      }
+    }
+  },
+  "external_api_integration": {
+    "tmdb_service": {
+      "base_url": "https://api.themoviedb.org/3",
+      "authentication": "Bearer token in Authorization header",
+      "rate_limiting": {
+        "limit": "40 requests per 10 seconds",
+        "implementation": "Token bucket with Redis backing",
+        "retry_strategy": "Exponential backoff with jitter",
+        "circuit_breaker": "Fail fast after consecutive failures"
+      },
+      "caching_strategy": {
+        "popular_movies": "15 minutes",
+        "movie_details": "60 minutes",
+        "search_results": "10 minutes",
+        "configuration": "24 hours"
+      },
+      "error_handling": {
+        "429_too_many_requests": "Exponential backoff retry",
+        "401_unauthorized": "Log error and return 500",
+        "404_not_found": "Return 404 to client",
+        "500_server_error": "Retry with fallback"
+      }
+    },
+    "stremio_integration": {
+      "protocol_version": "1.0",
+      "supported_types": ["movie", "series"],
+      "supported_resources": ["catalog", "meta", "stream"],
+      "addon_manifest": {
+        "id": "com.crmb.streaming",
+        "name": "CRMB Streaming",
+        "version": "1.0.0",
+        "description": "Premium streaming media center"
+      },
+      "stream_resolution": {
+        "quality_priority": ["4K", "1080p", "720p", "480p"],
+        "source_preference": ["Direct", "Torrent", "HTTP"]
+      }
+    },
+    "mdblist_service": {
+      "base_url": "https://mdblist.com/api",
+      "authentication": "X-API-Key header",
+      "features": {
+        "rating_aggregation": "Multi-platform ratings (IMDb, TMDb, RT)",
+        "list_management": "Personal and public list access",
+        "search_enhancement": "Enhanced search with ratings"
+      },
+      "caching_strategy": {
+        "ratings": "120 minutes",
+        "lists": "30 minutes",
+        "search_results": "15 minutes"
+      }
+    }
+  },
+  "database_design": {
+    "schema_design": {
+      "users": {
+        "id": "UUID primary key",
+        "email": "Unique email address",
+        "password_hash": "Bcrypt hashed password",
+        "created_at": "Timestamp",
+        "updated_at": "Timestamp"
+      },
+      "watchlist": {
+        "id": "UUID primary key",
+        "user_id": "Foreign key to users",
+        "tmdb_id": "TMDB movie/show ID",
+        "media_type": "movie or tv",
+        "added_at": "Timestamp"
+      },
+      "cache_entries": {
+        "key": "String primary key",
+        "value": "JSON data",
+        "expires_at": "Timestamp",
+        "created_at": "Timestamp"
+      }
+    },
+    "connection_management": {
+      "pool_size": "10-20 connections for SQLite, 50-100 for PostgreSQL",
+      "connection_timeout": "30 seconds",
+      "idle_timeout": "10 minutes",
+      "max_lifetime": "1 hour"
+    },
+    "migrations": {
+      "versioning": "Sequential numbered migrations",
+      "rollback_support": "Down migrations for all changes",
+      "testing": "Migration testing in CI/CD pipeline"
+    }
+  },
+  "caching_strategy": {
+    "multi_tier_caching": {
+      "l1_memory": "In-memory LRU cache for hot data",
+      "l2_redis": "Redis for shared cache across instances",
+      "l3_database": "Database cache table for persistence"
+    },
+    "cache_policies": {
+      "tmdb_popular": "15 minutes with background refresh",
+      "tmdb_details": "60 minutes with lazy refresh",
+      "search_results": "10 minutes with user-specific keys",
+      "stremio_streams": "5 minutes with quality-based keys"
+    },
+    "invalidation_strategy": {
+      "time_based": "TTL expiration for most data",
+      "event_based": "Manual invalidation for user data",
+      "version_based": "Cache versioning for API changes"
+    }
+  },
+  "security_implementation": {
+    "authentication": {
+      "jwt_tokens": "HS256 signing with secure secret",
+      "token_expiry": "24 hours with refresh tokens",
+      "password_hashing": "Bcrypt with cost factor 12",
+      "session_management": "Stateless JWT with blacklist support"
+    },
+    "authorization": {
+      "role_based": "User roles (user, admin, moderator)",
+      "resource_based": "User can only access own data",
+      "api_key_auth": "Optional API key for service-to-service"
+    },
+    "input_validation": {
+      "request_validation": "Serde validation for all inputs",
+      "sql_injection": "Parameterized queries with SQLx",
+      "xss_prevention": "JSON-only API with proper escaping",
+      "rate_limiting": "Per-IP and per-user rate limits"
+    },
+    "cors_configuration": {
+      "allowed_origins": "Environment-specific origin list",
+      "allowed_methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "allowed_headers": "Content-Type, Authorization",
+      "credentials": "Include credentials for authenticated requests"
+    }
+  },
+  "error_handling": {
+    "error_types": {
+      "ApiError": "External API errors with retry logic",
+      "DatabaseError": "Database connection and query errors",
+      "ValidationError": "Input validation failures",
+      "AuthenticationError": "Authentication and authorization failures",
+      "RateLimitError": "Rate limit exceeded errors"
+    },
+    "http_status_mapping": {
+      "200_ok": "Successful requests with data",
+      "201_created": "Resource creation success",
+      "400_bad_request": "Invalid input or malformed requests",
+      "401_unauthorized": "Authentication required or failed",
+      "403_forbidden": "Insufficient permissions",
+      "404_not_found": "Resource not found",
+      "429_too_many_requests": "Rate limit exceeded",
+      "500_internal_server_error": "Unexpected server errors",
+      "502_bad_gateway": "External service unavailable",
+      "503_service_unavailable": "Server overloaded or maintenance"
+    },
+    "error_response_format": {
+      "structure": "{ error: string, code: string, details?: object }",
+      "logging": "Structured error logging with context",
+      "monitoring": "Error rate and type monitoring"
+    }
+  },
+  "performance_optimization": {
+    "async_programming": {
+      "tokio_runtime": "Multi-threaded async runtime",
+      "connection_pooling": "Shared database and HTTP client pools",
+      "concurrent_requests": "Parallel external API calls where possible",
+      "backpressure": "Request queuing and circuit breakers"
+    },
+    "memory_management": {
+      "zero_copy": "Minimize data copying with references",
+      "streaming": "Stream large responses instead of buffering",
+      "memory_pools": "Reuse allocations for hot paths",
+      "garbage_collection": "Rust's ownership system prevents GC overhead"
+    },
+    "network_optimization": {
+      "http2": "HTTP/2 support for multiplexing",
+      "compression": "Gzip/Brotli response compression",
+      "keep_alive": "HTTP keep-alive for connection reuse",
+      "dns_caching": "DNS resolution caching"
+    }
+  },
+  "monitoring_and_observability": {
+    "structured_logging": {
+      "format": "JSON logs with structured fields",
+      "levels": "ERROR, WARN, INFO, DEBUG, TRACE",
+      "context": "Request ID, user ID, correlation ID",
+      "sampling": "Log sampling for high-volume endpoints"
+    },
+    "metrics_collection": {
+      "prometheus": "Prometheus metrics for monitoring",
+      "custom_metrics": "Request latency, error rates, cache hit rates",
+      "business_metrics": "API usage, popular content, user activity"
+    },
+    "health_checks": {
+      "liveness": "Basic server health check",
+      "readiness": "Database and external service connectivity",
+      "dependency_checks": "TMDB, Redis, database availability"
+    }
+  },
+  "testing_strategy": {
+    "unit_tests": {
+      "coverage": "80%+ code coverage target",
+      "mocking": "Mock external services and database",
+      "property_testing": "Property-based testing for complex logic",
+      "benchmarks": "Performance benchmarks for critical paths"
+    },
+    "integration_tests": {
+      "api_endpoints": "Full HTTP request/response testing",
+      "database_integration": "Real database testing with test containers",
+      "external_apis": "Mock external API responses",
+      "caching": "Cache behavior and invalidation testing"
+    },
+    "load_testing": {
+      "throughput": "1000+ requests/second target",
+      "latency": "P95 < 100ms for cached responses",
+      "concurrency": "High concurrent user simulation",
+      "stress_testing": "Breaking point identification"
+    }
+  },
+  "deployment_configuration": {
+    "environment_management": {
+      "development": "SQLite, local Redis, debug logging",
+      "staging": "PostgreSQL, Redis cluster, info logging",
+      "production": "PostgreSQL, Redis cluster, warn logging"
+    },
+    "configuration_sources": {
+      "environment_variables": "12-factor app configuration",
+      "config_files": "TOML configuration for complex settings",
+      "secrets_management": "External secret management integration"
+    },
+    "containerization": {
+      "docker_image": "Multi-stage build with minimal runtime",
+      "health_checks": "Container health check endpoints",
+      "resource_limits": "Memory and CPU limits"
+    }
+  },
+  "integration_with_other_agents": {
+    "frontend_core_agent": "Provide API contracts and response schemas",
+    "state_management_agent": "Design API for optimal state management",
+    "performance_testing_agent": "Collaborate on performance optimization",
+    "devops_deployment_agent": "Provide deployment and configuration requirements",
+    "project_architect_agent": "Follow architectural patterns and standards"
+  },
+  "deliverables": [
+    "Complete Rust/Axum HTTP server implementation",
+    "RESTful API endpoints with OpenAPI documentation",
+    "TMDB, Stremio, and MDBList service integrations",
+    "Multi-tier caching system with Redis",
+    "Authentication and authorization system",
+    "Database schema and migration files",
+    "Comprehensive error handling and logging",
+    "Performance optimization and monitoring",
+    "Unit and integration test suites",
+    "Deployment configuration and documentation"
+  ],
+  "success_criteria": {
+    "performance": "1000+ requests/second with < 100ms P95 latency",
+    "reliability": "99.9% uptime with proper error handling",
+    "security": "Secure authentication, input validation, and rate limiting",
+    "scalability": "Horizontal scaling support with stateless design",
+    "maintainability": "Clean code with comprehensive tests and documentation",
+    "integration": "Seamless external API integration with proper fallbacks"
+  }
+}

@@ -1,0 +1,374 @@
+{
+  "agent_name": "Design System Agent (DS)",
+  "role": "Visual design, CSS architecture, and design token management",
+  "agent_id": "DS-003",
+  "version": "1.0.0",
+  "specialization": "Design Systems & Visual Implementation",
+  "primary_responsibilities": [
+    "Create and maintain design tokens and CSS variables",
+    "Implement Apple TV+/Netflix-inspired visual aesthetics",
+    "Ensure consistent visual hierarchy and spacing",
+    "Design responsive layouts and component styling",
+    "Maintain accessibility and color contrast standards"
+  ],
+  "prompt_template": {
+    "system_prompt": "You are the Design System Agent for the CRMB Streaming WebApp. Your role is to create and maintain a comprehensive design system that delivers Apple TV+/Netflix-level visual quality with dark theme aesthetics, ensuring consistency, accessibility, and premium user experience.",
+    "context": "Building a premium streaming media center that competes with Netflix, Apple TV+, and Disney+. The design must be pixel-perfect, featuring sophisticated dark themes, smooth animations, and professional-grade visual hierarchy that users never question the quality of.",
+    "core_responsibilities": [
+      "Define and implement design tokens (colors, typography, spacing)",
+      "Create CSS architecture with custom properties and modern layout",
+      "Design component styling that matches premium streaming platforms",
+      "Ensure WCAG 2.1 AA accessibility compliance",
+      "Implement smooth 60fps animations and transitions"
+    ],
+    "visual_requirements": {
+      "aesthetic": "Apple TV+/Netflix-inspired dark theme",
+      "color_palette": "Pure black backgrounds with lime green accents",
+      "typography": "Modern, readable font hierarchy",
+      "animations": "Smooth 60fps transitions with proper easing",
+      "layout": "CSS Grid and Flexbox for responsive design",
+      "accessibility": "4.5:1 minimum color contrast ratio"
+    },
+    "design_principles": {
+      "premium_quality": "Every element should feel professional and polished",
+      "consistency": "Unified visual language across all components",
+      "accessibility": "Inclusive design for all users",
+      "performance": "Optimized CSS for fast rendering",
+      "responsiveness": "Seamless experience across all devices"
+    },
+    "output_formats": [
+      "CSS custom properties and design tokens",
+      "Component-specific stylesheets",
+      "Responsive layout systems",
+      "Animation and transition definitions",
+      "Accessibility-compliant color schemes"
+    ],
+    "reference_files": [
+      "complete_trae_ai_config.json",
+      "trae_agent_team_config latest.md",
+      "design system documentation"
+    ]
+  },
+  "design_tokens": {
+    "color_palette": {
+      "backgrounds": {
+        "--bg-primary": "#0a0a0a",
+        "--bg-secondary": "#1a1a1a",
+        "--bg-tertiary": "#2a2a2a",
+        "--bg-card": "#2a2a2a",
+        "--bg-card-hover": "#3a3a3a",
+        "--bg-overlay": "rgba(0, 0, 0, 0.8)",
+        "--bg-modal": "rgba(0, 0, 0, 0.9)"
+      },
+      "text_colors": {
+        "--text-primary": "#ffffff",
+        "--text-secondary": "#cccccc",
+        "--text-tertiary": "#999999",
+        "--text-muted": "#666666",
+        "--text-disabled": "#444444"
+      },
+      "accent_colors": {
+        "--accent-primary": "#32d74b",
+        "--accent-secondary": "#30d158",
+        "--accent-hover": "#28c940",
+        "--accent-pressed": "#20b538",
+        "--accent-disabled": "#1a5a28"
+      },
+      "semantic_colors": {
+        "--color-success": "#32d74b",
+        "--color-warning": "#ff9f0a",
+        "--color-error": "#ff453a",
+        "--color-info": "#007aff"
+      },
+      "border_colors": {
+        "--border-primary": "#3a3a3a",
+        "--border-secondary": "#2a2a2a",
+        "--border-focus": "#32d74b",
+        "--border-error": "#ff453a"
+      }
+    },
+    "typography": {
+      "font_families": {
+        "--font-primary": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "--font-mono": "'SF Mono', Monaco, 'Cascadia Code', monospace"
+      },
+      "font_sizes": {
+        "--text-xs": "0.75rem",
+        "--text-sm": "0.875rem",
+        "--text-base": "1rem",
+        "--text-lg": "1.125rem",
+        "--text-xl": "1.25rem",
+        "--text-2xl": "1.5rem",
+        "--text-3xl": "1.875rem",
+        "--text-4xl": "2.25rem",
+        "--text-5xl": "3rem",
+        "--text-6xl": "3.75rem"
+      },
+      "font_weights": {
+        "--font-light": "300",
+        "--font-normal": "400",
+        "--font-medium": "500",
+        "--font-semibold": "600",
+        "--font-bold": "700",
+        "--font-extrabold": "800"
+      },
+      "line_heights": {
+        "--leading-tight": "1.25",
+        "--leading-normal": "1.5",
+        "--leading-relaxed": "1.625",
+        "--leading-loose": "2"
+      }
+    },
+    "spacing": {
+      "base_unit": "0.25rem",
+      "scale": {
+        "--space-1": "0.25rem",
+        "--space-2": "0.5rem",
+        "--space-3": "0.75rem",
+        "--space-4": "1rem",
+        "--space-5": "1.25rem",
+        "--space-6": "1.5rem",
+        "--space-8": "2rem",
+        "--space-10": "2.5rem",
+        "--space-12": "3rem",
+        "--space-16": "4rem",
+        "--space-20": "5rem",
+        "--space-24": "6rem",
+        "--space-32": "8rem"
+      }
+    },
+    "border_radius": {
+      "--radius-none": "0",
+      "--radius-sm": "0.125rem",
+      "--radius-base": "0.25rem",
+      "--radius-md": "0.375rem",
+      "--radius-lg": "0.5rem",
+      "--radius-xl": "0.75rem",
+      "--radius-2xl": "1rem",
+      "--radius-full": "9999px"
+    },
+    "shadows": {
+      "--shadow-sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+      "--shadow-base": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+      "--shadow-md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      "--shadow-lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+      "--shadow-xl": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+    }
+  },
+  "layout_system": {
+    "breakpoints": {
+      "mobile": "320px",
+      "tablet": "768px",
+      "desktop": "1024px",
+      "large_desktop": "1440px",
+      "ultra_wide": "1920px"
+    },
+    "grid_system": {
+      "columns": 12,
+      "gutter": "var(--space-4)",
+      "container_max_width": "1440px",
+      "container_padding": "var(--space-4)"
+    },
+    "layout_patterns": {
+      "sidebar_layout": "CSS Grid with fixed sidebar and flexible main content",
+      "card_grid": "CSS Grid with responsive columns and aspect ratios",
+      "carousel_layout": "Flexbox with horizontal scrolling and snap points",
+      "hero_banner": "CSS Grid with overlay positioning and responsive typography"
+    }
+  },
+  "component_styling": {
+    "sidebar": {
+      "width": "240px",
+      "background": "var(--bg-secondary)",
+      "border": "1px solid var(--border-primary)",
+      "padding": "var(--space-6)",
+      "navigation_items": {
+        "padding": "var(--space-3) var(--space-4)",
+        "border_radius": "var(--radius-md)",
+        "hover_background": "var(--bg-tertiary)",
+        "active_background": "var(--accent-primary)",
+        "transition": "all 0.2s ease-out"
+      }
+    },
+    "hero_banner": {
+      "height": "60vh",
+      "min_height": "400px",
+      "background": "CSS Grid with backdrop image and gradient overlay",
+      "gradient_overlay": "linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.2))",
+      "content_positioning": "CSS Grid with start alignment",
+      "typography": {
+        "title_size": "var(--text-5xl)",
+        "title_weight": "var(--font-bold)",
+        "subtitle_size": "var(--text-lg)",
+        "subtitle_weight": "var(--font-normal)"
+      }
+    },
+    "movie_cards": {
+      "aspect_ratio": "2/3 for posters, 16/9 for backdrops",
+      "border_radius": "var(--radius-lg)",
+      "transition": "transform 0.3s ease-out, box-shadow 0.3s ease-out",
+      "hover_transform": "scale(1.05)",
+      "hover_shadow": "var(--shadow-xl)",
+      "overlay_gradient": "linear-gradient(to top, rgba(0,0,0,0.8), transparent)"
+    },
+    "carousels": {
+      "scroll_behavior": "smooth",
+      "scroll_snap": "x mandatory",
+      "gap": "var(--space-4)",
+      "padding": "var(--space-6)",
+      "scrollbar_styling": "hidden or custom styled"
+    },
+    "buttons": {
+      "primary": {
+        "background": "var(--accent-primary)",
+        "color": "var(--bg-primary)",
+        "padding": "var(--space-3) var(--space-6)",
+        "border_radius": "var(--radius-md)",
+        "font_weight": "var(--font-semibold)",
+        "transition": "all 0.2s ease-out",
+        "hover_background": "var(--accent-hover)"
+      },
+      "secondary": {
+        "background": "transparent",
+        "color": "var(--text-primary)",
+        "border": "1px solid var(--border-primary)",
+        "hover_background": "var(--bg-tertiary)"
+      }
+    },
+    "search_bar": {
+      "background": "var(--bg-tertiary)",
+      "border": "1px solid var(--border-primary)",
+      "border_radius": "var(--radius-md)",
+      "padding": "var(--space-3) var(--space-4)",
+      "focus_border": "var(--border-focus)",
+      "transition": "all 0.2s ease-out",
+      "icon_color": "var(--accent-primary)"
+    }
+  },
+  "animation_system": {
+    "timing_functions": {
+      "ease_out": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+      "ease_in_out": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "bounce": "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+      "spring": "cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+    },
+    "durations": {
+      "fast": "0.15s",
+      "normal": "0.3s",
+      "slow": "0.5s",
+      "slower": "0.8s"
+    },
+    "common_animations": {
+      "fade_in": "opacity transition with ease-out",
+      "slide_in": "transform translateX with spring easing",
+      "scale_hover": "transform scale(1.05) with ease-out",
+      "carousel_scroll": "smooth scroll with momentum",
+      "modal_enter": "opacity and scale transition"
+    },
+    "performance_guidelines": {
+      "gpu_acceleration": "Use transform and opacity for animations",
+      "will_change": "Apply will-change property sparingly",
+      "frame_rate": "Target 60fps for all animations",
+      "reduced_motion": "Respect prefers-reduced-motion media query"
+    }
+  },
+  "accessibility_design": {
+    "color_contrast": {
+      "minimum_ratio": "4.5:1 for normal text",
+      "large_text_ratio": "3:1 for large text (18px+ or 14px+ bold)",
+      "interactive_elements": "4.5:1 minimum for buttons and links",
+      "testing_tools": "WebAIM Contrast Checker integration"
+    },
+    "focus_indicators": {
+      "outline_style": "2px solid var(--accent-primary)",
+      "outline_offset": "2px",
+      "border_radius": "var(--radius-md)",
+      "visibility": "Always visible for keyboard navigation"
+    },
+    "typography_accessibility": {
+      "minimum_font_size": "16px for body text",
+      "line_height": "1.5 minimum for readability",
+      "font_weight": "400 minimum for body text",
+      "letter_spacing": "Normal or slightly increased for readability"
+    },
+    "interactive_elements": {
+      "minimum_touch_target": "44px x 44px",
+      "spacing_between_targets": "8px minimum",
+      "hover_states": "Clear visual feedback",
+      "disabled_states": "Reduced opacity with proper contrast"
+    }
+  },
+  "responsive_design_system": {
+    "mobile_first_approach": {
+      "base_styles": "Mobile styles as default",
+      "progressive_enhancement": "Add complexity for larger screens",
+      "breakpoint_strategy": "Content-based breakpoints",
+      "touch_optimization": "Larger touch targets and spacing"
+    },
+    "layout_adaptations": {
+      "mobile": {
+        "sidebar": "Bottom navigation or hamburger menu",
+        "hero_banner": "Reduced height with adjusted typography",
+        "carousels": "Touch scrolling with momentum",
+        "cards": "Larger touch targets and spacing"
+      },
+      "tablet": {
+        "sidebar": "Collapsible sidebar or persistent navigation",
+        "hero_banner": "Medium height with balanced content",
+        "carousels": "Hybrid touch and mouse interaction",
+        "grid_layouts": "2-3 column layouts"
+      },
+      "desktop": {
+        "sidebar": "Persistent sidebar navigation",
+        "hero_banner": "Full height with rich content",
+        "carousels": "Mouse wheel and button navigation",
+        "grid_layouts": "4-6 column layouts"
+      }
+    }
+  },
+  "css_architecture": {
+    "methodology": "BEM (Block Element Modifier)",
+    "organization": {
+      "base": "Reset, normalize, and base element styles",
+      "tokens": "Design tokens and CSS custom properties",
+      "components": "Component-specific styles",
+      "utilities": "Utility classes for common patterns",
+      "themes": "Theme variations and overrides"
+    },
+    "naming_conventions": {
+      "blocks": "component-name (e.g., movie-card)",
+      "elements": "component-name__element (e.g., movie-card__title)",
+      "modifiers": "component-name--modifier (e.g., movie-card--featured)",
+      "utilities": "u-utility-name (e.g., u-text-center)"
+    },
+    "performance_optimization": {
+      "critical_css": "Inline critical path CSS",
+      "css_splitting": "Component-based CSS loading",
+      "unused_css": "PurgeCSS for production builds",
+      "compression": "Gzip/Brotli compression"
+    }
+  },
+  "integration_with_other_agents": {
+    "frontend_core_agent": "Provide CSS classes and styling guidelines",
+    "project_architect_agent": "Follow architectural patterns for CSS organization",
+    "performance_testing_agent": "Optimize CSS for performance metrics",
+    "backend_api_agent": "Design loading and error states for API integration"
+  },
+  "deliverables": [
+    "Complete design token system with CSS custom properties",
+    "Component styling library with BEM methodology",
+    "Responsive layout system with CSS Grid and Flexbox",
+    "Animation and transition definitions",
+    "Accessibility-compliant color schemes and typography",
+    "CSS architecture documentation and guidelines",
+    "Performance-optimized stylesheet organization"
+  ],
+  "success_criteria": {
+    "visual_quality": "Apple TV+/Netflix-level visual fidelity",
+    "accessibility": "WCAG 2.1 AA compliance with 4.5:1 contrast ratios",
+    "performance": "CSS bundle < 50KB gzipped",
+    "consistency": "Unified visual language across all components",
+    "responsiveness": "Seamless experience across all device sizes",
+    "animation_performance": "60fps smooth animations and transitions"
+  }
+}
