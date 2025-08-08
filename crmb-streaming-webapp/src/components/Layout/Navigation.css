@@ -1,0 +1,226 @@
+/* Navigation Component Styles */
+.navigation {
+  --navigation-width: 240px;
+  --navigation-width-collapsed: 60px;
+  
+  position: fixed;
+  left: 0;
+  top: var(--header-height, 70px);
+  bottom: 0;
+  width: var(--navigation-width);
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  z-index: var(--z-index-navigation, 50);
+  transition: all var(--transition-base);
+  overflow-y: auto;
+}
+
+.navigation__container {
+  padding: var(--spacing-lg) 0;
+  height: 100%;
+}
+
+.navigation__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.navigation__item {
+  margin: 0;
+}
+
+.navigation__link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-base);
+  border-radius: 0;
+  position: relative;
+}
+
+.navigation__link:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+.navigation__link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.navigation__link--active {
+  background: var(--color-primary-alpha);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.navigation__link--active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--color-primary);
+}
+
+.navigation__icon {
+  font-size: var(--font-size-lg);
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.navigation__label {
+  font-size: var(--font-size-base);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Collapsed State */
+.navigation--collapsed {
+  width: var(--navigation-width-collapsed);
+}
+
+.navigation--collapsed .navigation__label {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.navigation--collapsed .navigation__link {
+  justify-content: center;
+  padding: var(--spacing-md);
+}
+
+/* Mobile Navigation */
+@media (max-width: 768px) {
+  .navigation {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-top: 1px solid var(--color-border);
+    z-index: var(--z-index-navigation-mobile, 60);
+  }
+  
+  .navigation__container {
+    padding: var(--spacing-sm) 0;
+  }
+  
+  .navigation__list {
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 0;
+  }
+  
+  .navigation__item {
+    flex: 1;
+  }
+  
+  .navigation__link {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    text-align: center;
+    min-height: 60px;
+  }
+  
+  .navigation__icon {
+    font-size: var(--font-size-xl);
+  }
+  
+  .navigation__label {
+    font-size: var(--font-size-xs);
+    line-height: 1.2;
+  }
+  
+  .navigation__link--active::before {
+    left: 50%;
+    right: auto;
+    top: 0;
+    bottom: auto;
+    width: 20px;
+    height: 3px;
+    transform: translateX(-50%);
+  }
+}
+
+/* Tablet Navigation */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .navigation {
+    --navigation-width: 200px;
+    --navigation-width-collapsed: 60px;
+  }
+}
+
+/* Hidden State */
+.navigation--hidden {
+  transform: translateX(-100%);
+}
+
+@media (max-width: 768px) {
+  .navigation--hidden {
+    transform: translateY(100%);
+  }
+}
+
+/* Scrollbar Styling */
+.navigation::-webkit-scrollbar {
+  width: 4px;
+}
+
+.navigation::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.navigation::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+.navigation::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* Animation */
+@keyframes navigationSlideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.navigation {
+  animation: navigationSlideIn 0.3s ease-out;
+}
+
+@media (max-width: 768px) {
+  @keyframes navigationSlideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  
+  .navigation {
+    animation: navigationSlideUp 0.3s ease-out;
+  }
+}

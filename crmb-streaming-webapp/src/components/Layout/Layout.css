@@ -1,0 +1,83 @@
+/* Layout Component Styles */
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.layout__content {
+  display: flex;
+  flex: 1;
+  position: relative;
+}
+
+.layout__main {
+  flex: 1;
+  padding: var(--spacing-lg);
+  margin-left: var(--navigation-width, 0);
+  transition: margin-left var(--transition-base);
+  overflow-x: hidden;
+}
+
+/* Mobile Layout */
+@media (max-width: 768px) {
+  .layout__content {
+    flex-direction: column;
+  }
+  
+  .layout__main {
+    margin-left: 0;
+    padding: var(--spacing-md);
+  }
+}
+
+/* Tablet Layout */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .layout__main {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+}
+
+/* Desktop Layout */
+@media (min-width: 1025px) {
+  .layout__main {
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+}
+
+/* Layout States */
+.layout--loading {
+  pointer-events: none;
+}
+
+.layout--loading .layout__main {
+  opacity: 0.7;
+}
+
+/* Responsive Navigation */
+.layout__content:has(.navigation--collapsed) .layout__main {
+  margin-left: var(--navigation-width-collapsed, 60px);
+}
+
+.layout__content:has(.navigation--hidden) .layout__main {
+  margin-left: 0;
+}
+
+/* Print Styles */
+@media print {
+  .layout {
+    background: white;
+    color: black;
+  }
+  
+  .layout__content {
+    flex-direction: column;
+  }
+  
+  .layout__main {
+    margin-left: 0;
+    padding: 0;
+  }
+}
