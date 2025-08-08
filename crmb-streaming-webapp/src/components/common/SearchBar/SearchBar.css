@@ -1,0 +1,107 @@
+/* SearchBar Component Styles */
+
+.search-container {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-form {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 20px 12px 45px;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 25px;
+  color: #fff;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus,
+.search-input.focused {
+  border-color: #666;
+  background: #222;
+}
+
+.search-input::placeholder {
+  color: #888;
+}
+
+.search-icon-container {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.search-icon {
+  color: #888;
+  width: 18px;
+  height: 18px;
+}
+
+.clear-button {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.clear-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.clear-button svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .search-container {
+    max-width: 100%;
+  }
+  
+  .search-input {
+    font-size: 14px;
+    padding: 10px 18px 10px 40px;
+  }
+  
+  .search-icon-container {
+    left: 12px;
+  }
+  
+  .search-icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .clear-button {
+    right: 12px;
+  }
+}

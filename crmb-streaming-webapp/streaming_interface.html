@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUMBLE - Streaming Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            padding: 20px 0;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 25px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #666;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: auto;
+            width: 60px;
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-icon {
+            width: 44px;
+            height: 44px;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+
+        .sidebar-icon:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 100px;
+            min-height: 100vh;
+        }
+
+        .hero-section {
+            padding: 80px 0;
+            text-align: left;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 30px;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            color: #ccc;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .start-watching-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+            border: none;
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .start-watching-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+        }
+
+        .start-watching-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 20px 0;
+        }
+
+        .content-section.movies-section {
+            padding-top: 10px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .see-all {
+            color: #888;
+            text-decoration: none;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .see-all:hover {
+            color: #fff;
+        }
+
+        /* Episode Cards */
+        .episodes-container {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .episodes-slider {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding-bottom: 10px;
+        }
+
+        .episodes-slider::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .episodes-slider::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .episodes-slider::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .episode-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            min-width: 400px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .episode-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .episode-thumbnail {
+            width: 160px;
+            height: 90px;
+            background: #333;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .episode-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .episode-info {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .episode-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .episode-description {
+            color: #888;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .episode-duration {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .days-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Movies Grid */
+        .movies-container {
+            position: relative;
+        }
+
+        .movies-slider {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding-bottom: 10px;
+        }
+
+        .movies-slider::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .movies-slider::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .movies-slider::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .movie-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 2/3;
+            min-width: 180px;
+            flex-shrink: 0;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .movie-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            padding: 20px;
+            color: #fff;
+        }
+
+        /* Sample movie posters */
+        .movie-1 { background: linear-gradient(45deg, #1a1a1a, #333); }
+        .movie-2 { background: linear-gradient(45deg, #ff4444, #cc0000); }
+        .movie-3 { background: linear-gradient(45deg, #1a1a1a, #444); }
+        .movie-4 { background: linear-gradient(45deg, #0066cc, #004499); }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                left: 10px;
+                width: 50px;
+                padding: 15px 0;
+            }
+
+            .sidebar-icon {
+                width: 38px;
+                height: 38px;
+                margin: 6px 0;
+            }
+
+            .sidebar-icon svg {
+                width: 18px;
+                height: 18px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .episodes-slider {
+                gap: 15px;
+            }
+
+            .episode-card {
+                min-width: 350px;
+            }
+
+            .episode-thumbnail {
+                width: 140px;
+                height: 80px;
+            }
+
+            .movies-slider {
+                gap: 12px;
+            }
+
+            .movie-card {
+                min-width: 140px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-icon">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+        </div>
+        <div class="sidebar-icon">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+        </div>
+        <div class="sidebar-icon">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="container">
+                <div class="search-container">
+                    <svg class="search-icon" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                    <input type="text" class="search-input" placeholder="Search movies, shows...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="container">
+                <h1 class="hero-title">CRUMBLE</h1>
+                <p class="hero-description">
+                    Stream the latest movies and TV shows in stunning quality. Discover your next 
+                    favorite series or catch up on blockbuster films.
+                </p>
+                <button class="start-watching-btn">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    Start Watching
+                </button>
+            </div>
+        </div>
+
+        <!-- Up Next Section -->
+        <div class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Up Next</h2>
+                    <a href="#" class="see-all">See All ></a>
+                </div>
+                
+                <div class="episodes-container">
+                    <div class="episodes-slider">
+                        <div class="episode-card">
+                            <div class="episode-thumbnail">
+                                <div style="width: 100%; height: 100%; background: linear-gradient(45deg, #1a1a1a, #333); display: flex; align-items: center; justify-content: center; color: #666; font-size: 2rem;">🎬</div>
+                            </div>
+                            <div class="episode-info">
+                                <div class="episode-title">S01E03. The Beginning</div>
+                                <div class="episode-description">A new journey starts as survivors search for hope...</div>
+                                <div class="episode-duration">45 min</div>
+                            </div>
+                        </div>
+
+                        <div class="episode-card">
+                            <div class="episode-thumbnail">
+                                <div class="days-badge">📅 in 3 days</div>
+                                <div style="width: 100%; height: 100%; background: linear-gradient(45deg, #ff4444, #cc0000); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2rem;">🔥</div>
+                            </div>
+                            <div class="episode-info">
+                                <div class="episode-title">S02E05. The Return</div>
+                                <div class="episode-description">An unexpected alliance forms in the wasteland...</div>
+                                <div class="episode-duration">52 min</div>
+                            </div>
+                        </div>
+
+                        <div class="episode-card">
+                            <div class="episode-thumbnail">
+                                <div style="width: 100%; height: 100%; background: linear-gradient(45deg, #0066cc, #004499); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2rem;">⚡</div>
+                            </div>
+                            <div class="episode-info">
+                                <div class="episode-title">S01E04. The Storm</div>
+                                <div class="episode-description">Nature unleashes its fury as the group seeks shelter...</div>
+                                <div class="episode-duration">48 min</div>
+                            </div>
+                        </div>
+
+                        <div class="episode-card">
+                            <div class="episode-thumbnail">
+                                <div style="width: 100%; height: 100%; background: linear-gradient(45deg, #663399, #441166); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2rem;">🌙</div>
+                            </div>
+                            <div class="episode-info">
+                                <div class="episode-title">S01E05. Night Falls</div>
+                                <div class="episode-description">Darkness brings new threats and unexpected discoveries...</div>
+                                <div class="episode-duration">51 min</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Movies Section -->
+        <div class="content-section movies-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Movies - Popular</h2>
+                    <a href="#" class="see-all">See All ></a>
+                </div>
+                
+                <div class="movies-container">
+                    <div class="movies-slider">
+                        <div class="movie-card movie-1">
+                            <div class="movie-overlay">
+                                <div style="font-size: 3rem; text-align: center;">🎭</div>
+                            </div>
+                        </div>
+                        <div class="movie-card movie-2">
+                            <div class="movie-overlay">
+                                <div style="font-size: 3rem; text-align: center;">🚀</div>
+                            </div>
+                        </div>
+                        <div class="movie-card movie-3">
+                            <div class="movie-overlay">
+                                <div style="font-size: 3rem; text-align: center;">⚔️</div>
+                            </div>
+                        </div>
+                        <div class="movie-card movie-4">
+                            <div class="movie-overlay">
+                                <div style="font-size: 3rem; text-align: center; color: #0099ff;">🌊</div>
+                            </div>
+                        </div>
+                        <div class="movie-card movie-1">
+                            <div class="movie-overlay">
+                                <div style="font-size: 3rem; text-align: center;">🎯</div>
+                            </div>
+                        </div>
+                        <div class="movie-card movie-2">
+                            <div class="movie-overlay">
+                                <div style="font-size: 3rem; text-align: center;">🌟</div>
+                            </div>
+                        </div>
+                        <div class="movie-card movie-3">
+                            <div class="movie-overlay">
+                                <div style="font-size: 3rem; text-align: center;">🎪</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('focus', function() {
+            this.style.background = '#222';
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            this.style.background = '#1a1a1a';
+        });
+
+        // Interactive elements
+        document.querySelectorAll('.episode-card, .movie-card').forEach(card => {
+            card.addEventListener('click', function() {
+                console.log('Content clicked:', this);
+            });
+        });
+
+        document.querySelector('.start-watching-btn').addEventListener('click', function() {
+            alert('Welcome to CRUMBLE! Start your streaming journey.');
+        });
+
+        // Sidebar interactions
+        document.querySelectorAll('.sidebar-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                document.querySelectorAll('.sidebar-icon').forEach(i => i.style.color = '#888');
+                this.style.color = '#fff';
+            });
+        });
+
+        // Smooth scrolling for carousels
+        document.querySelectorAll('.episodes-slider, .movies-slider').forEach(slider => {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                slider.classList.add('active');
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+            });
+
+            slider.addEventListener('mouseleave', () => {
+                isDown = false;
+                slider.classList.remove('active');
+            });
+
+            slider.addEventListener('mouseup', () => {
+                isDown = false;
+                slider.classList.remove('active');
+            });
+
+            slider.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 2;
+                slider.scrollLeft = scrollLeft - walk;
+            });
+        });
+    </script>
+</body>
+</html>

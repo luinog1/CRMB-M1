@@ -1,0 +1,77 @@
+/* ContentSection Component Styles */
+
+/* Episodes Container */
+.episodes-container {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.episodes-slider {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 10px;
+  cursor: grab;
+}
+
+.episodes-slider.active {
+  cursor: grabbing;
+}
+
+.episodes-slider::-webkit-scrollbar {
+  height: 6px;
+}
+
+.episodes-slider::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.episodes-slider::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+/* Movies Container */
+.movies-container {
+  position: relative;
+}
+
+.movies-slider {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 10px;
+  cursor: grab;
+}
+
+.movies-slider.active {
+  cursor: grabbing;
+}
+
+.movies-slider::-webkit-scrollbar {
+  height: 6px;
+}
+
+.movies-slider::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.movies-slider::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .episodes-slider {
+    gap: 15px;
+  }
+
+  .movies-slider {
+    gap: 12px;
+  }
+}

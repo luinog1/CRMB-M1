@@ -1,0 +1,105 @@
+/* EpisodeCard Component Styles */
+
+.episode-card {
+  background: #1a1a1a;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  min-width: 400px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.episode-card:hover {
+  transform: translateY(-5px);
+}
+
+.episode-thumbnail {
+  width: 160px;
+  height: 90px;
+  background: #333;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.episode-thumbnail-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 2rem;
+}
+
+.episode-info {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.episode-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.episode-description {
+  color: #888;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.episode-duration {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.days-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 1;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .episode-card {
+    min-width: 350px;
+  }
+
+  .episode-thumbnail {
+    width: 140px;
+    height: 80px;
+  }
+  
+  .episode-thumbnail-content {
+    font-size: 1.5rem;
+  }
+  
+  .episode-info {
+    padding: 15px;
+  }
+  
+  .episode-title {
+    font-size: 1rem;
+  }
+  
+  .episode-description {
+    font-size: 0.8rem;
+  }
+}

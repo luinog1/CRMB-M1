@@ -1,0 +1,58 @@
+/* MovieCard Component Styles */
+
+.movie-card {
+  background: #1a1a1a;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 2/3;
+  min-width: 180px;
+  flex-shrink: 0;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+}
+
+.movie-poster {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.movie-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  padding: 20px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.movie-emoji {
+  font-size: 3rem;
+  text-align: center;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .movie-card {
+    min-width: 140px;
+  }
+  
+  .movie-overlay {
+    padding: 15px;
+  }
+  
+  .movie-emoji {
+    font-size: 2.5rem;
+  }
+}

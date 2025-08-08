@@ -1,0 +1,87 @@
+/* HeroBanner Component Styles */
+
+.hero-section {
+  padding: 80px 0;
+  text-align: left;
+}
+
+.hero-title {
+  font-size: 4rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 30px;
+  color: #fff;
+}
+
+.hero-description {
+  font-size: 1.2rem;
+  color: #ccc;
+  max-width: 600px;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.start-watching-btn {
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+  border: none;
+  padding: 15px 25px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.start-watching-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+}
+
+.start-watching-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 60px 0;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .hero-description {
+    font-size: 1rem;
+    margin-bottom: 30px;
+  }
+  
+  .start-watching-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+  
+  .start-watching-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-description {
+    font-size: 0.9rem;
+  }
+}
