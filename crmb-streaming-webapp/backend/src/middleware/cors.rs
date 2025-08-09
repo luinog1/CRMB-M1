@@ -386,8 +386,9 @@ async fn handle_api_preflight_request(origin: Option<&str>, path: &str) -> Respo
         }
     } else {
         // Standard CORS for other API endpoints
+        let allowed_origins: Vec<String> = get_allowed_origins().into_iter().collect();
         if let Some(origin) = origin {
-            if is_origin_allowed(origin) {
+            if is_origin_allowed(origin, &allowed_origins) {
                 headers.insert(
                     "access-control-allow-origin",
                     HeaderValue::from_str(origin).unwrap_or_else(|_| HeaderValue::from_static("*")),
@@ -426,8 +427,9 @@ async fn handle_api_preflight_request(origin: Option<&str>, path: &str) -> Respo
 fn add_api_cors_headers(response: &mut Response, origin: Option<&str>) {
     let headers = response.headers_mut();
     
+    let allowed_origins: Vec<String> = get_allowed_origins().into_iter().collect();
     if let Some(origin) = origin {
-        if is_origin_allowed(origin) {
+        if is_origin_allowed(origin, &allowed_origins) {
             headers.insert(
                 "access-control-allow-origin",
                 HeaderValue::from_str(origin).unwrap_or_else(|_| HeaderValue::from_static("*")),

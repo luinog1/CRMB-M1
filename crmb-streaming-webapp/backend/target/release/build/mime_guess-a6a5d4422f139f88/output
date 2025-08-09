@@ -1,0 +1,1 @@
+cargo:rustc-env=MIME_TYPES_GENERATED_PATH=/Users/luinog/Documents/GitHub/CRMB-M1/crmb-streaming-webapp/backend/target/release/build/mime_guess-a6a5d4422f139f88/out/mime_types_generated.rs

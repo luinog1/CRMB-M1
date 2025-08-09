@@ -1,0 +1,9 @@
+/Users/luinog/Documents/GitHub/CRMB-M1/crmb-streaming-webapp/backend/target/release/deps/libsqlite3_sys-e03d45fd2c90d581.d: /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsqlite3-sys-0.27.0/src/lib.rs /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsqlite3-sys-0.27.0/src/error.rs /Users/luinog/Documents/GitHub/CRMB-M1/crmb-streaming-webapp/backend/target/release/build/libsqlite3-sys-89b4aa1171714c34/out/bindgen.rs
+
+/Users/luinog/Documents/GitHub/CRMB-M1/crmb-streaming-webapp/backend/target/release/deps/liblibsqlite3_sys-e03d45fd2c90d581.rmeta: /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsqlite3-sys-0.27.0/src/lib.rs /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsqlite3-sys-0.27.0/src/error.rs /Users/luinog/Documents/GitHub/CRMB-M1/crmb-streaming-webapp/backend/target/release/build/libsqlite3-sys-89b4aa1171714c34/out/bindgen.rs
+
+/Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsqlite3-sys-0.27.0/src/lib.rs:
+/Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsqlite3-sys-0.27.0/src/error.rs:
+/Users/luinog/Documents/GitHub/CRMB-M1/crmb-streaming-webapp/backend/target/release/build/libsqlite3-sys-89b4aa1171714c34/out/bindgen.rs:
+
+# env-dep:OUT_DIR=/Users/luinog/Documents/GitHub/CRMB-M1/crmb-streaming-webapp/backend/target/release/build/libsqlite3-sys-89b4aa1171714c34/out

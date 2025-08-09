@@ -1,0 +1,11 @@
+/Users/luinog/Documents/GitHub/CRMB-M1/crmb-streaming-webapp/backend/target/release/deps/sqlx-40d992b4cf8a7ece.d: /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/lib.rs /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/any/mod.rs /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/macros/mod.rs /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/ty_match.rs /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/lib.md /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/macros/test.md /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/any/install_drivers_note.md
+
+/Users/luinog/Documents/GitHub/CRMB-M1/crmb-streaming-webapp/backend/target/release/deps/libsqlx-40d992b4cf8a7ece.rmeta: /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/lib.rs /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/any/mod.rs /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/macros/mod.rs /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/ty_match.rs /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/lib.md /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/macros/test.md /Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/any/install_drivers_note.md
+
+/Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/lib.rs:
+/Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/any/mod.rs:
+/Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/macros/mod.rs:
+/Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/ty_match.rs:
+/Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/lib.md:
+/Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/macros/test.md:
+/Users/luinog/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sqlx-0.7.4/src/any/install_drivers_note.md:
