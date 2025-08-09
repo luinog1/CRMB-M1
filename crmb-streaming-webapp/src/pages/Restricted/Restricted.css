@@ -1,0 +1,189 @@
+/* Restricted Page Styles */
+.restricted-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background);
+  padding: 2rem;
+}
+
+.restricted-container {
+  max-width: 500px;
+  text-align: center;
+  padding: 2rem;
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.restricted-icon {
+  margin: 0 auto 1.5rem;
+  color: var(--color-warning, #f59e0b);
+  opacity: 0.8;
+}
+
+.restricted-title {
+  margin: 0 0 1rem;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.restricted-message {
+  margin: 0 0 2rem;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.restricted-actions {
+  margin-bottom: 2rem;
+}
+
+.restricted-note {
+  margin: 0 0 1.5rem;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  padding: 1rem;
+  background: var(--color-surface-variant);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.restricted-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.restricted-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  min-width: 140px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.restricted-button--primary {
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+}
+
+.restricted-button--primary:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.restricted-button--secondary {
+  background: var(--color-surface-variant);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.restricted-button--secondary:hover {
+  background: var(--color-surface-hover);
+  transform: translateY(-1px);
+}
+
+.restricted-button:active {
+  transform: translateY(0);
+}
+
+.restricted-info {
+  text-align: left;
+  padding: 1.5rem;
+  background: var(--color-surface-variant);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.restricted-info h3 {
+  margin: 0 0 1rem;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.restricted-info ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: var(--color-text-secondary);
+}
+
+.restricted-info li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.restricted-info li:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .restricted-page {
+    padding: 1rem;
+  }
+  
+  .restricted-container {
+    padding: 1.5rem;
+  }
+  
+  .restricted-title {
+    font-size: var(--font-size-xl);
+  }
+  
+  .restricted-buttons {
+    flex-direction: column;
+  }
+  
+  .restricted-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .restricted-icon svg {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .restricted-title {
+    font-size: var(--font-size-lg);
+  }
+  
+  .restricted-message {
+    font-size: var(--font-size-base);
+  }
+}
+
+/* Dark theme optimizations */
+@media (prefers-color-scheme: dark) {
+  .restricted-container {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+  
+  .restricted-info {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .restricted-note {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .restricted-button:hover {
+    transform: none;
+  }
+}
