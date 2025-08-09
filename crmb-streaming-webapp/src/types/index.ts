@@ -187,7 +187,7 @@ export interface MediaItem {
   runtime?: number
   status?: 'released' | 'upcoming' | 'in_production'
   source: 'tmdb' | 'stremio' | 'mdblist'
-  metadata?: TMDBMovie | TMDBTVShow | StremioMetaItem
+  metadata?: TMDBMovie | TMDBTVShow | TMDBPerson | StremioMetaItem
 }
 
 export interface WatchlistItem {

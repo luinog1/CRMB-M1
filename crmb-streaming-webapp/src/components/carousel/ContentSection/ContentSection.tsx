@@ -1,64 +1,61 @@
 import { useRef, useEffect } from 'react'
 import EpisodeCard from '../EpisodeCard/EpisodeCard'
 import MovieCard from '../MovieCard/MovieCard'
+import { useContentCatalog } from '../../../hooks/useContentCatalog'
+import { dataTransformService } from '../../../services/dataTransform'
 import './ContentSection.css'
+
+type CatalogType = 
+  | 'popular_movies'
+  | 'upcoming_movies'
+  | 'top_rated_movies'
+  | 'now_playing_movies'
+  | 'popular_tv'
+  | 'top_rated_tv'
+  | 'on_the_air_tv'
+  | 'trending_all'
+  | 'trending_movies'
+  | 'trending_tv'
 
 interface ContentSectionProps {
   title: string
   type: 'episodes' | 'movies'
+  catalogType: CatalogType
   showSeeAll?: boolean
+  autoRefresh?: boolean
 }
 
-const ContentSection = ({ title, type, showSeeAll = true }: ContentSectionProps) => {
+const ContentSection = ({ 
+  title, 
+  type, 
+  catalogType, 
+  showSeeAll = true, 
+  autoRefresh = false 
+}: ContentSectionProps) => {
   const sliderRef = useRef<HTMLDivElement>(null)
+  
+  // Use TMDB content catalog
+  const { 
+    items, 
+    isLoading, 
+    error, 
+    hasMore, 
+    loadMore, 
+    retry 
+  } = useContentCatalog({ 
+    catalogType, 
+    autoRefresh,
+    pageSize: 20 
+  })
 
-  // Mock data for episodes
-  const episodesData = [
-    {
-      id: 1,
-      title: 'S01E03. The Beginning',
-      description: 'A new journey starts as survivors search for hope...',
-      duration: '45 min',
-      thumbnail: '🎬',
-      gradient: 'linear-gradient(45deg, #1a1a1a, #333)'
-    },
-    {
-      id: 2,
-      title: 'S02E05. The Return',
-      description: 'An unexpected alliance forms in the wasteland...',
-      duration: '52 min',
-      thumbnail: '🔥',
-      gradient: 'linear-gradient(45deg, #ff4444, #cc0000)',
-      badge: '📅 in 3 days'
-    },
-    {
-      id: 3,
-      title: 'S01E04. The Storm',
-      description: 'Nature unleashes its fury as the group seeks shelter...',
-      duration: '48 min',
-      thumbnail: '⚡',
-      gradient: 'linear-gradient(45deg, #0066cc, #004499)'
-    },
-    {
-      id: 4,
-      title: 'S01E05. Night Falls',
-      description: 'Darkness brings new threats and unexpected discoveries...',
-      duration: '51 min',
-      thumbnail: '🌙',
-      gradient: 'linear-gradient(45deg, #663399, #441166)'
-    }
-  ]
-
-  // Mock data for movies
-  const moviesData = [
-    { id: 1, emoji: '🎭', gradient: 'linear-gradient(45deg, #1a1a1a, #333)' },
-    { id: 2, emoji: '🚀', gradient: 'linear-gradient(45deg, #ff4444, #cc0000)' },
-    { id: 3, emoji: '⚔️', gradient: 'linear-gradient(45deg, #1a1a1a, #444)' },
-    { id: 4, emoji: '🌊', gradient: 'linear-gradient(45deg, #0066cc, #004499)' },
-    { id: 5, emoji: '🎯', gradient: 'linear-gradient(45deg, #1a1a1a, #333)' },
-    { id: 6, emoji: '🌟', gradient: 'linear-gradient(45deg, #ff4444, #cc0000)' },
-    { id: 7, emoji: '🎪', gradient: 'linear-gradient(45deg, #1a1a1a, #444)' }
-  ]
+  // Transform TMDB data for UI components
+  const episodesData = type === 'episodes' 
+    ? dataTransformService.createEpisodeData(items[0])
+    : []
+    
+  const moviesData = type === 'movies'
+    ? dataTransformService.createMovieCardData(items.slice(0, 10))
+    : []
 
   useEffect(() => {
     const slider = sliderRef.current
@@ -108,7 +105,69 @@ const ContentSection = ({ title, type, showSeeAll = true }: ContentSectionProps)
 
   const handleSeeAllClick = () => {
     console.log(`See all ${title} clicked`)
-    // TODO: Implement navigation to full list
+    // TODO: Implement navigation to full list with catalogType
+  }
+
+  const handleLoadMore = () => {
+    if (hasMore && !isLoading) {
+      loadMore()
+    }
+  }
+
+  const handleRetry = () => {
+    retry()
+  }
+
+  // Show loading state
+  if (isLoading && items.length === 0) {
+    return (
+      <div className={`content-section ${type === 'movies' ? 'movies-section' : ''}`}>
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">{title}</h2>
+          </div>
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Loading {title.toLowerCase()}...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error state
+  if (error && items.length === 0) {
+    return (
+      <div className={`content-section ${type === 'movies' ? 'movies-section' : ''}`}>
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">{title}</h2>
+          </div>
+          <div className="error-state">
+            <p>Failed to load {title.toLowerCase()}</p>
+            <button className="retry-button" onClick={handleRetry}>
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show empty state
+  if (!isLoading && items.length === 0) {
+    return (
+      <div className={`content-section ${type === 'movies' ? 'movies-section' : ''}`}>
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">{title}</h2>
+          </div>
+          <div className="empty-state">
+            <p>No {title.toLowerCase()} available</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -129,16 +188,36 @@ const ContentSection = ({ title, type, showSeeAll = true }: ContentSectionProps)
             className={`${type}-slider`}
           >
             {type === 'episodes' ? (
-              episodesData.map((episode) => (
+              episodesData.map((episode: any) => (
                 <EpisodeCard key={episode.id} episode={episode} />
               ))
             ) : (
-              moviesData.map((movie) => (
+              moviesData.map((movie: any) => (
                 <MovieCard key={movie.id} movie={movie} />
               ))
             )}
+            
+            {/* Load more button for horizontal scroll */}
+            {hasMore && (
+              <div className="load-more-card">
+                <button 
+                  className="load-more-button" 
+                  onClick={handleLoadMore}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Loading...' : 'Load More'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
+        
+        {/* Loading indicator for additional content */}
+        {isLoading && items.length > 0 && (
+          <div className="loading-more">
+            <div className="loading-spinner small"></div>
+          </div>
+        )}
       </div>
     </div>
   )

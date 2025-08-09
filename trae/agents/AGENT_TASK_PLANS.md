@@ -69,49 +69,70 @@ Deliverables:
 ## Agent 02: Frontend Core (FC-002)
 
 ### Primary Responsibilities
-- React application foundation
-- Core component architecture
-- Routing and navigation
-- Base layout structure
+- React application enhancement and optimization
+- Advanced component architecture
+- Routing and navigation system expansion
+- Performance optimization and new features
 
 ### Task List
 
-#### Phase 1: React Foundation
-1. **Application Setup**
-   - Initialize React 18+ with TypeScript strict mode
-   - Configure Vite build tool with optimization settings
-   - Set up React Router v6 for navigation
-   - Implement error boundaries and fallback UI
+#### Phase 1: Core Enhancement (COMPLETED ✅)
+1. **Project Setup and Configuration** ✅
+   - ✅ React project with Vite and TypeScript initialized
+   - ✅ ESLint, Prettier, and development tools configured
+   - ✅ Project structure and file organization established
+   - ✅ Environment configuration implemented
 
-2. **Core Layout Structure**
-   - Create main application layout with sidebar + content area
-   - Implement responsive grid system using CSS Grid/Flexbox
-   - Set up navigation components and routing structure
-   - Create base page templates
+2. **Core Layout Components** ✅
+   - ✅ Responsive sidebar navigation component (/src/components/common/Sidebar/)
+   - ✅ Main content area with proper grid layout
+   - ✅ SearchBar component with search functionality (/src/components/common/SearchBar/)
+   - ✅ HeroBanner component with CRUMBLE branding (/src/components/hero/HeroBanner/)
 
-3. **Component Architecture**
-   - Establish component folder structure and naming conventions
-   - Create base component interfaces and prop types
-   - Implement common hooks and utilities
-   - Set up component composition patterns
+3. **Content Components** ✅
+   - ✅ ContentSection with horizontal carousels (/src/components/carousel/ContentSection/)
+   - ✅ EpisodeCard component (/src/components/carousel/EpisodeCard/)
+   - ✅ MovieCard component (/src/components/carousel/MovieCard/)
+   - ✅ Responsive design with mobile-first approach
 
-4. **Development Infrastructure**
-   - Configure hot module replacement and fast refresh
-   - Set up TypeScript path mapping and imports
-   - Implement development tools and debugging setup
-   - Create component development environment
+#### Phase 2: Advanced Features (NEXT PRIORITY)
+4. **Routing Infrastructure**
+   - Configure React Router v6 with proper route structure
+   - Implement navigation guards and route protection
+   - Create dynamic routing for content pages (movie/episode details)
+   - Set up error boundaries and 404 handling
+
+5. **Component Architecture Enhancement**
+   - Establish advanced component patterns and hooks
+   - Create reusable UI components library expansion
+   - Implement proper TypeScript interfaces for TMDB data
+   - Set up component testing framework
+
+6. **Performance Optimization**
+   - Implement code splitting and lazy loading
+   - Set up bundle analysis and optimization
+   - Configure service worker for caching
+   - Optimize asset loading and compression
 
 ### Agent Prompt
 ```
-You are the Frontend Core Agent for the CRMB Streaming WebApp. Your role is to build the React application foundation and core component architecture.
+You are the Frontend Core Agent for the CRMB Streaming WebApp. Your role is to enhance and extend the React application foundation and core component architecture.
 
 Current Task: [Specific task from above list]
 
 Project Context:
-- Premium streaming platform with modern React architecture
+- Premium CRUMBLE streaming platform with modern React architecture
 - TypeScript strict mode with comprehensive type safety
 - Vite build tool for optimal development experience
-- Target: Mobile-first responsive design
+- CRUMBLE streaming interface successfully implemented
+
+Implemented Components (Reference):
+- Sidebar: /src/components/common/Sidebar/Sidebar.tsx
+- SearchBar: /src/components/common/SearchBar/SearchBar.tsx
+- HeroBanner: /src/components/hero/HeroBanner/HeroBanner.tsx
+- ContentSection: /src/components/carousel/ContentSection/ContentSection.tsx
+- EpisodeCard: /src/components/carousel/EpisodeCard/EpisodeCard.tsx
+- MovieCard: /src/components/carousel/MovieCard/MovieCard.tsx
 
 Technical Requirements:
 - React 18+ with concurrent features
@@ -120,17 +141,18 @@ Technical Requirements:
 - React Router v6 for navigation
 - Error boundaries for robust error handling
 
-Layout Specifications:
-- Left sidebar navigation (minimal, icon-based)
-- Main content area with hero banner
+Layout Specifications (IMPLEMENTED):
+- Left sidebar navigation with Home, Favorites, Search, Settings icons
+- Main content area with CRUMBLE hero banner
+- Horizontal scrolling carousels for episodes and movies
 - Responsive breakpoints: mobile (320px+), tablet (768px+), desktop (1024px+)
-- Dark theme as primary design
+- Dark theme with lime green accents (#32d74b)
 
 Deliverables:
-- Fully configured React application
-- Core layout components with responsive design
-- Routing structure and navigation system
-- Component architecture documentation
+- Enhanced React application with new features
+- Additional layout components and pages
+- Advanced routing structure and navigation
+- Component optimization and performance improvements
 ```
 
 ---
@@ -138,52 +160,75 @@ Deliverables:
 ## Agent 03: Design System (DS-003)
 
 ### Primary Responsibilities
-- Dark theme implementation
-- Component styling and visual design
-- Typography and spacing systems
-- Animation and interaction design
+- Design system enhancement and expansion
+- Advanced component styling and variants
+- Animation optimization and new interactions
+- Accessibility improvements and compliance
 
 ### Task List
 
-#### Phase 1: Design Foundation
-1. **Dark Theme Implementation**
-   - Implement CSS custom properties for color system
-   - Create comprehensive color palette with semantic naming
-   - Set up theme switching infrastructure
-   - Ensure WCAG AA contrast compliance
+#### Phase 1: Design Foundation (COMPLETED ✅)
+1. **Dark Theme Implementation** ✅
+   - ✅ CSS custom properties for color system (/src/styles/global.css)
+   - ✅ Comprehensive CRUMBLE color palette with semantic naming
+   - ✅ Dark theme with lime green accents (#32d74b)
+   - ✅ WCAG AA contrast compliance ensured
 
-2. **Typography System**
-   - Define font hierarchy and sizing scale
-   - Implement responsive typography with fluid scaling
-   - Set up font loading optimization
-   - Create text component variants
+2. **Typography System** ✅
+   - ✅ Font hierarchy and sizing scale defined
+   - ✅ Responsive typography with fluid scaling
+   - ✅ System font optimization
+   - ✅ Text component variants implemented
 
-3. **Component Styling**
-   - Style core layout components (sidebar, header, content areas)
-   - Create card components with hover effects
-   - Implement button variants and interactive states
-   - Design form components and input styles
+3. **Component Styling** ✅
+   - ✅ Core layout components styled (Sidebar, SearchBar, HeroBanner)
+   - ✅ Card components with hover effects (EpisodeCard, MovieCard)
+   - ✅ Button variants and interactive states
+   - ✅ Form components and input styles (SearchBar)
 
-4. **Animation System**
-   - Create smooth transitions and micro-interactions
-   - Implement hover effects and loading animations
-   - Set up carousel animations and scroll effects
-   - Ensure 60fps performance for all animations
+4. **Animation System** ✅
+   - ✅ Smooth transitions and micro-interactions (0.3s ease-out)
+   - ✅ Hover effects and loading animations (scale 1.05)
+   - ✅ Carousel animations and scroll effects
+   - ✅ 60fps performance for all animations
+
+#### Phase 2: Advanced Design Features (NEXT PRIORITY)
+5. **Component Variants and States**
+   - Create loading states and skeleton components
+   - Implement error states and empty state designs
+   - Design modal and overlay components
+   - Create advanced button and input variants
+
+6. **Advanced Animations**
+   - Implement page transition animations
+   - Create advanced carousel effects and parallax
+   - Design loading animations and progress indicators
+   - Optimize animation performance with GPU acceleration
 
 ### Agent Prompt
 ```
-You are the Design System Agent for the CRMB Streaming WebApp. Your role is to create a premium dark theme design system that rivals Netflix and Apple TV+.
+You are the Design System Agent for the CRMB Streaming WebApp. Your role is to enhance and extend the premium CRUMBLE design system that rivals Netflix and Apple TV+.
 
 Current Task: [Specific task from above list]
 
 Project Context:
-- Premium streaming platform requiring sophisticated visual design
+- Premium CRUMBLE streaming platform with sophisticated visual design
 - Apple TV+/Netflix-inspired aesthetics with modern dark theme
 - Mobile-first responsive design with touch interactions
 - Performance target: 60fps smooth animations
+- CRUMBLE design system successfully implemented
 
-Design Requirements:
-Color Palette (MANDATORY):
+Implemented Design System (Reference):
+- Global Styles: /src/styles/global.css
+- Sidebar Styling: /src/components/common/Sidebar/Sidebar.css
+- SearchBar Styling: /src/components/common/SearchBar/SearchBar.css
+- HeroBanner Styling: /src/components/hero/HeroBanner/HeroBanner.css
+- ContentSection Styling: /src/components/carousel/ContentSection/ContentSection.css
+- EpisodeCard Styling: /src/components/carousel/EpisodeCard/EpisodeCard.css
+- MovieCard Styling: /src/components/carousel/MovieCard/MovieCard.css
+
+Design Requirements (IMPLEMENTED):
+Color Palette:
 - --bg-primary: #0a0a0a (Pure black)
 - --bg-secondary: #1a1a1a (Secondary dark)
 - --bg-card: #2a2a2a (Card backgrounds)
@@ -191,13 +236,15 @@ Color Palette (MANDATORY):
 - --text-secondary: #cccccc (Secondary text)
 - --accent-green: #32d74b (Lime green accent)
 
-Visual Standards:
+Visual Standards (IMPLEMENTED):
 - Typography: Bold, clean hierarchy with proper contrast
 - Animations: 0.3s ease-out transitions, scale(1.05) hover effects
 - Cards: Subtle shadows, rounded corners, smooth hover states
 - Layout: Generous whitespace, clear visual hierarchy
+- Carousels: Horizontal scrolling with smooth snap-to-item behavior
+- Icons: SVG icons with lime green accent color
 
-Accessibility:
+Accessibility (IMPLEMENTED):
 - WCAG 2.1 AA compliance
 - High contrast mode support
 - Reduced motion preferences
@@ -212,7 +259,7 @@ Deliverables:
 
 ---
 
-## Agent 04: API Integration (AI-004)
+## Agent 04: API Integration (AI-004) - HIGH PRIORITY
 
 ### Primary Responsibilities
 - TMDB API integration and management
@@ -222,26 +269,35 @@ Deliverables:
 
 ### Task List
 
-#### Phase 1: TMDB Integration
+#### Phase 1: TMDB Integration (IMMEDIATE PRIORITY)
 1. **TMDB Service Implementation**
    - Create comprehensive TMDB API service class
    - Implement rate limiting (40 requests/10 seconds)
    - Set up request caching and deduplication
    - Handle API authentication and configuration
+   - Replace mock data in ContentSection with real TMDB data
 
 2. **Content Fetching**
    - Implement popular movies/TV shows endpoints
-   - Create search functionality with debouncing
+   - Create search functionality with debouncing for SearchBar
    - Set up trending content and recommendations
    - Handle image URL generation and optimization
+   - Integrate with existing EpisodeCard and MovieCard components
 
-3. **Stremio Protocol Integration**
+3. **Frontend Integration**
+   - Connect TMDB service to existing components
+   - Update ContentSection to use real movie/episode data
+   - Implement search functionality in SearchBar component
+   - Add loading states and error handling to UI components
+
+#### Phase 2: Advanced Features
+4. **Stremio Protocol Integration**
    - Implement Stremio addon manifest handling
    - Create catalog, meta, and stream endpoints
    - Set up Cinemeta fallback integration
    - Handle addon discovery and management
 
-4. **Error Handling & Fallbacks**
+5. **Error Handling & Fallbacks**
    - Implement comprehensive error handling
    - Create fallback chains for failed requests
    - Set up offline mode and cached responses
@@ -249,15 +305,23 @@ Deliverables:
 
 ### Agent Prompt
 ```
-You are the API Integration Agent for the CRMB Streaming WebApp. Your role is to integrate all external APIs and services, ensuring reliable data flow and robust error handling.
+You are the API Integration Agent for the CRMB Streaming WebApp. Your role is to integrate all external APIs and services with the existing CRUMBLE UI components, ensuring reliable data flow and robust error handling.
 
 Current Task: [Specific task from above list]
 
 Project Context:
-- Premium streaming platform requiring reliable metadata
+- Premium CRUMBLE streaming platform with implemented UI components
 - TMDB as primary source with Stremio addon support
 - Rate limiting: 40 requests per 10 seconds for TMDB
 - Fallback chain: TMDB → Cinemeta → OMDb → Placeholder
+- UI components ready for real data integration
+
+Implemented UI Components (Ready for Integration):
+- ContentSection: /src/components/carousel/ContentSection/ContentSection.tsx (currently using mock data)
+- EpisodeCard: /src/components/carousel/EpisodeCard/EpisodeCard.tsx
+- MovieCard: /src/components/carousel/MovieCard/MovieCard.tsx
+- SearchBar: /src/components/common/SearchBar/SearchBar.tsx (needs search functionality)
+- HeroBanner: /src/components/hero/HeroBanner/HeroBanner.tsx (needs dynamic content)
 
 Technical Requirements:
 TMDB Integration:
@@ -266,6 +330,7 @@ TMDB Integration:
 - Authentication: Bearer token or API key
 - Caching: 5-15 minute cache for responses
 - Rate limiting: Token bucket algorithm
+- Integration with existing TypeScript components
 
 Stremio Protocol:
 - Manifest endpoint: /manifest.json
@@ -279,46 +344,59 @@ Error Handling:
 - Graceful degradation for missing data
 - User-friendly error messages
 - Offline mode support
+- Loading states for UI components
 
 Deliverables:
 - Complete TMDB API service with rate limiting
-- Stremio addon protocol implementation
+- Frontend integration with existing components
+- Real data replacing mock data in ContentSection
+- Functional search in SearchBar component
 - Robust error handling and fallback systems
 - API documentation and usage examples
 ```
 
 ---
 
-## Agent 05: Backend API (BA-005)
+## Agent 05: Backend API (BA-005) - HIGH PRIORITY
 
 ### Primary Responsibilities
 - Rust backend server development
 - Internal API endpoints
 - Database integration
 - Authentication and security
+- TMDB proxy endpoints for frontend
 
 ### Task List
 
-#### Phase 1: Rust Server Foundation
+#### Phase 1: Rust Server Foundation (IMMEDIATE PRIORITY)
 1. **Axum Server Setup**
    - Initialize Rust project with Axum framework
    - Configure middleware for CORS, logging, and security
    - Set up request/response handling and serialization
    - Implement health check and monitoring endpoints
+   - Create TMDB proxy endpoints for frontend consumption
 
-2. **Database Integration**
+2. **TMDB Proxy Integration**
+   - Create proxy endpoints for TMDB API calls
+   - Implement rate limiting for TMDB requests
+   - Set up caching layer for TMDB responses
+   - Handle TMDB authentication and error responses
+   - Support frontend components with required data formats
+
+3. **Database Integration**
    - Set up SQLite for development, PostgreSQL for production
    - Create database schema for users, watchlists, preferences
    - Implement database connection pooling
    - Set up migrations and schema management
 
-3. **Internal API Endpoints**
+#### Phase 2: User Features
+4. **Internal API Endpoints**
    - Create user management endpoints (registration, login)
    - Implement watchlist and favorites management
    - Set up user preferences and settings
    - Create content rating and review endpoints
 
-4. **Security & Authentication**
+5. **Security & Authentication**
    - Implement JWT token authentication
    - Set up password hashing and validation
    - Create session management and refresh tokens
@@ -326,27 +404,42 @@ Deliverables:
 
 ### Agent Prompt
 ```
-You are the Backend API Agent for the CRMB Streaming WebApp. Your role is to build a robust Rust backend server that handles user data, authentication, and internal API endpoints.
+You are the Backend API Agent for the CRMB Streaming WebApp. Your role is to build a robust Rust backend server that handles user data, authentication, and TMDB proxy endpoints for the existing CRUMBLE UI components.
 
 Current Task: [Specific task from above list]
 
 Project Context:
-- Premium streaming platform requiring secure user management
+- Premium CRUMBLE streaming platform with implemented UI components
 - Rust/Axum backend for performance and safety
 - SQLite for development, PostgreSQL for production
 - JWT authentication with session management
+- Frontend components ready for real data integration
+
+Implemented Frontend Components (Requiring Backend Support):
+- ContentSection: /src/components/carousel/ContentSection/ContentSection.tsx (needs TMDB data)
+- SearchBar: /src/components/common/SearchBar/SearchBar.tsx (needs search endpoints)
+- HeroBanner: /src/components/hero/HeroBanner/HeroBanner.tsx (needs featured content)
+- Frontend running on: http://localhost:3000
 
 Technical Requirements:
 Rust Dependencies:
 - axum = "0.7" (HTTP framework)
 - tokio = { version = "1.0", features = ["full"] }
 - serde = { version = "1.0", features = ["derive"] }
+- reqwest = { version = "0.11", features = ["json"] } (TMDB proxy)
 - sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite"] }
 - tower-http = { version = "0.5", features = ["cors", "fs"] }
 - jsonwebtoken = "9.0" (JWT handling)
 - bcrypt = "0.15" (Password hashing)
 
-API Endpoints:
+Priority API Endpoints (Phase 1):
+- GET /api/movies/popular (TMDB proxy for ContentSection)
+- GET /api/movies/upcoming (TMDB proxy for ContentSection)
+- GET /api/search/movies?q={query} (TMDB proxy for SearchBar)
+- GET /api/movies/{id} (TMDB proxy for detailed views)
+- GET /api/configuration (TMDB image configuration)
+
+User API Endpoints (Phase 2):
 - POST /api/auth/register (User registration)
 - POST /api/auth/login (User login)
 - GET /api/user/profile (User profile)
@@ -358,48 +451,61 @@ Security Requirements:
 - HTTPS only in production
 - JWT tokens with 24h expiration
 - Bcrypt password hashing (cost: 12)
-- CORS configuration for frontend domain
+- CORS configuration for frontend domain (http://localhost:3000)
 - Rate limiting: 100 requests/minute per IP
+- TMDB API rate limiting: 40 requests/10 seconds
 
 Deliverables:
 - Complete Rust backend with Axum framework
+- TMDB proxy endpoints with rate limiting and caching
 - Database schema and migration system
 - Secure authentication and user management
 - Internal API endpoints with proper validation
+- CORS configuration for frontend integration
 ```
 
 ---
 
-## Agent 06: State Management (SM-006)
+## Agent 06: State Management (SM-006) - HIGH PRIORITY
 
 ### Primary Responsibilities
-- React state architecture
+- React state architecture for existing components
 - Data flow patterns
 - Context providers and hooks
 - Local storage integration
+- Integration with CRUMBLE UI components
 
 ### Task List
 
-#### Phase 1: State Architecture
+#### Phase 1: State Architecture (IMMEDIATE PRIORITY)
 1. **Context Providers Setup**
    - Create app-wide context providers for global state
    - Implement user authentication context
    - Set up content/media context for TMDB data
    - Create UI state context for modals, loading states
+   - Integrate with existing ContentSection, SearchBar, HeroBanner
 
 2. **Custom Hooks Development**
    - Create useAuth hook for authentication state
    - Implement useContent hook for media data management
    - Set up useLocalStorage hook for persistence
    - Create useAPI hook for data fetching patterns
+   - Create useSearch hook for SearchBar component
 
-3. **Data Flow Patterns**
+3. **Component State Integration**
+   - Connect ContentSection to content state management
+   - Implement search state for SearchBar component
+   - Set up hero banner state for dynamic content
+   - Add loading and error states to existing components
+
+#### Phase 2: Advanced Features
+4. **Data Flow Patterns**
    - Implement useReducer patterns for complex state
    - Set up optimistic updates for user interactions
    - Create data normalization and caching strategies
    - Handle loading, error, and success states
 
-4. **Persistence Layer**
+5. **Persistence Layer**
    - Integrate localStorage for user preferences
    - Implement watchlist and favorites persistence
    - Set up session storage for temporary data
@@ -407,15 +513,23 @@ Deliverables:
 
 ### Agent Prompt
 ```
-You are the State Management Agent for the CRMB Streaming WebApp. Your role is to architect and implement the React state management system using Context API and custom hooks.
+You are the State Management Agent for the CRMB Streaming WebApp. Your role is to architect and implement the React state management system for the existing CRUMBLE UI components using Context API and custom hooks.
 
 Current Task: [Specific task from above list]
 
 Project Context:
-- Premium streaming platform with complex user interactions
+- Premium CRUMBLE streaming platform with implemented UI components
 - React Context + useReducer for state management
 - Local persistence for offline functionality
 - Real-time updates for user preferences and watchlists
+- Existing components ready for state integration
+
+Implemented UI Components (Requiring State Management):
+- ContentSection: /src/components/carousel/ContentSection/ContentSection.tsx (needs content state)
+- SearchBar: /src/components/common/SearchBar/SearchBar.tsx (needs search state)
+- HeroBanner: /src/components/hero/HeroBanner/HeroBanner.tsx (needs featured content state)
+- EpisodeCard & MovieCard: Need loading and interaction states
+- Sidebar: /src/components/common/Sidebar/Sidebar.tsx (needs navigation state)
 
 State Architecture Requirements:
 Global State Contexts:
@@ -423,19 +537,30 @@ Global State Contexts:
 - ContentContext: TMDB data, search results, catalogs
 - UIContext: Modals, loading states, notifications
 - PreferencesContext: User settings and preferences
+- SearchContext: Search queries, results, and history
 
 Custom Hooks:
 - useAuth(): Authentication state and actions
 - useContent(): Content fetching and caching
+- useSearch(): Search functionality for SearchBar
 - useWatchlist(): Watchlist management
 - useFavorites(): Favorites management
 - useLocalStorage(): Persistent local data
+- useHeroBanner(): Featured content for HeroBanner
+
+Component Integration:
+- Connect ContentSection to ContentContext
+- Integrate SearchBar with SearchContext
+- Link HeroBanner to featured content state
+- Add loading states to all card components
+- Implement error boundaries for components
 
 Data Flow Patterns:
 - Optimistic updates for user actions
 - Error boundaries for state errors
 - Loading states for async operations
 - Cache invalidation strategies
+- Real-time search with debouncing
 
 Persistence Strategy:
 - localStorage: User preferences, theme settings
@@ -446,42 +571,52 @@ Persistence Strategy:
 Deliverables:
 - Complete React Context architecture
 - Custom hooks for all major features
+- State integration with existing components
 - Local storage integration with sync
 - State management documentation and patterns
 ```
 
 ---
 
-## Agent 07: Performance & Testing (PT-007)
+## Agent 07: Performance & Testing (PT-007) - MEDIUM PRIORITY
 
 ### Primary Responsibilities
-- Performance optimization
+- Performance optimization for CRUMBLE components
 - Testing implementation (Unit, Integration, E2E)
 - Quality assurance processes
 - Bundle optimization and monitoring
 
 ### Task List
 
-#### Phase 1: Performance Optimization
-1. **Frontend Performance**
-   - Implement lazy loading for components and routes
-   - Set up image optimization with WebP/AVIF
-   - Create virtual scrolling for large lists
-   - Optimize bundle splitting and code splitting
+#### Phase 1: Component Testing (NEXT PRIORITY)
+1. **Frontend Testing**
+   - Set up Jest and React Testing Library for existing components
+   - Create unit tests for ContentSection, SearchBar, HeroBanner
+   - Test EpisodeCard and MovieCard components
+   - Implement Sidebar and navigation testing
+   - Add accessibility testing for all components
 
-2. **Backend Performance**
+2. **Performance Optimization**
+   - Implement lazy loading for components and routes
+   - Set up image optimization with WebP/AVIF for movie posters
+   - Create virtual scrolling for large content lists
+   - Optimize bundle splitting and code splitting
+   - Analyze current bundle size and performance metrics
+
+#### Phase 2: Advanced Testing
+3. **Backend Performance**
    - Implement request caching and memoization
    - Set up database query optimization
    - Create connection pooling and resource management
    - Implement response compression and caching headers
 
-3. **Testing Infrastructure**
-   - Set up Jest and React Testing Library for unit tests
-   - Implement Cypress for end-to-end testing
+4. **E2E Testing Infrastructure**
+   - Set up Cypress for end-to-end testing
    - Create integration tests for API endpoints
+   - Test user flows with existing UI components
    - Set up performance testing and monitoring
 
-4. **Quality Assurance**
+5. **Quality Assurance**
    - Implement automated accessibility testing
    - Set up cross-browser compatibility testing
    - Create performance monitoring and alerting
@@ -489,15 +624,25 @@ Deliverables:
 
 ### Agent Prompt
 ```
-You are the Performance & Testing Agent for the CRMB Streaming WebApp. Your role encompasses performance optimization, comprehensive testing, and quality assurance to ensure a premium user experience.
+You are the Performance & Testing Agent for the CRMB Streaming WebApp. Your role encompasses performance optimization, comprehensive testing, and quality assurance for the existing CRUMBLE UI components to ensure a premium user experience.
 
 Current Task: [Specific task from above list]
 
 Project Context:
-- Premium streaming platform requiring Netflix-level performance
+- Premium CRUMBLE streaming platform with implemented UI components
 - Target: 90+ Lighthouse performance score
 - Core Web Vitals: LCP < 2.5s, FID < 100ms, CLS < 0.1
 - Cross-browser support: Chrome, Firefox, Safari, Edge
+- Existing components ready for testing and optimization
+
+Implemented UI Components (Requiring Testing):
+- ContentSection: /src/components/carousel/ContentSection/ContentSection.tsx
+- SearchBar: /src/components/common/SearchBar/SearchBar.tsx
+- HeroBanner: /src/components/hero/HeroBanner/HeroBanner.tsx
+- EpisodeCard: /src/components/carousel/EpisodeCard/EpisodeCard.tsx
+- MovieCard: /src/components/carousel/MovieCard/MovieCard.tsx
+- Sidebar: /src/components/common/Sidebar/Sidebar.tsx
+- CSS Modules: Various .module.css files for styling
 
 Performance Targets:
 Frontend:
@@ -506,6 +651,7 @@ Frontend:
 - Time to Interactive: < 3.5s
 - 60fps smooth animations
 - Image optimization: WebP/AVIF with JPEG fallbacks
+- Carousel performance: Smooth scrolling and lazy loading
 
 Backend:
 - Response time: < 100ms for cached responses
@@ -515,111 +661,128 @@ Backend:
 
 Testing Requirements:
 Unit Tests (Jest + RTL):
-- Component rendering and behavior
+- ContentSection component rendering and carousel functionality
+- SearchBar component behavior and search interactions
+- HeroBanner component with dynamic content
+- EpisodeCard and MovieCard component rendering
+- Sidebar navigation and responsive behavior
 - Custom hooks functionality
 - Utility functions and helpers
-- State management logic
 
 Integration Tests:
 - API endpoint functionality
-- Database operations
-- Authentication flows
+- Component integration with state management
+- Search functionality end-to-end
+- Content loading and display
 - Error handling scenarios
 
 E2E Tests (Cypress):
-- User registration and login
-- Content browsing and search
-- Watchlist management
+- Content browsing with existing carousel components
+- Search functionality using SearchBar
+- Navigation using Sidebar
 - Responsive design validation
+- Accessibility testing for all components
 
 Quality Assurance:
-- Accessibility: WCAG 2.1 AA compliance
+- Accessibility: WCAG 2.1 AA compliance for all components
 - Performance: Lighthouse CI integration
 - Cross-browser: BrowserStack or similar
 - Security: OWASP compliance checks
+- Component-specific performance metrics
 
 Deliverables:
-- Comprehensive testing suite with high coverage
-- Performance optimization implementation
+- Comprehensive testing suite for all existing components
+- Performance optimization for carousel and search
 - Quality assurance processes and documentation
-- Monitoring and alerting system setup
+- Component performance monitoring
+- Accessibility compliance verification
 ```
 
 ---
 
-## Agent 08: DevOps & Deployment (DD-008)
+## Agent 08: DevOps & Deployment (DD-008) - LOW PRIORITY
 
 ### Primary Responsibilities
-- Development environment setup
-- Build and deployment pipelines
-- Infrastructure configuration
-- Monitoring and maintenance
+- Development environment optimization for existing CRUMBLE UI
+- Build and deployment pipelines for React/Rust stack
+- Infrastructure configuration for production readiness
+- Monitoring and maintenance setup
 
 ### Task List
 
-#### Phase 1: Development Infrastructure
-1. **Development Environment**
-   - Set up Docker containers for consistent development
-   - Create development database and service configurations
-   - Implement hot reloading for both frontend and backend
-   - Set up development proxy and CORS configuration
+#### Phase 1: Development Infrastructure - FUTURE PRIORITY
+1. **Development Environment Optimization**
+   - Optimize Docker containers for CRUMBLE development workflow
+   - Configure development database for TMDB integration testing
+   - Enhance hot reloading for existing UI components
+   - Set up development proxy for API integration testing
 
-2. **Build Pipelines**
-   - Configure Vite build optimization for production
-   - Set up Rust release builds with optimization
-   - Implement automated testing in CI/CD pipeline
-   - Create build artifacts and deployment packages
+2. **Build Pipelines for CRUMBLE**
+   - Configure Vite build optimization for existing components
+   - Set up Rust release builds with TMDB proxy optimization
+   - Implement automated testing for implemented UI components
+   - Create deployment packages for CRUMBLE platform
 
-3. **Deployment Configuration**
-   - Set up production environment configuration
-   - Configure reverse proxy (Nginx) for serving
+#### Phase 2: Production Deployment - LATER PRIORITY
+1. **Deployment Configuration**
+   - Set up production environment for CRUMBLE platform
+   - Configure reverse proxy (Nginx) for React/Rust serving
    - Implement SSL/TLS certificates and security headers
    - Set up database migrations and backup strategies
 
-4. **Monitoring & Maintenance**
-   - Implement application logging and monitoring
-   - Set up error tracking and alerting
-   - Create health checks and uptime monitoring
+2. **Monitoring & Maintenance**
+   - Implement application logging for CRUMBLE components
+   - Set up error tracking for UI and API integration
+   - Create health checks for TMDB proxy endpoints
    - Establish backup and disaster recovery procedures
 
 ### Agent Prompt
 ```
-You are the DevOps & Deployment Agent for the CRMB Streaming WebApp. Your role is to establish robust development infrastructure, deployment pipelines, and production monitoring.
+You are the DevOps & Deployment Agent for the CRMB Streaming WebApp. Your role is to optimize development infrastructure and prepare deployment pipelines for the existing CRUMBLE UI components and future backend integration.
 
 Current Task: [Specific task from above list]
 
 Project Context:
-- Premium streaming platform requiring high availability
+- Premium CRUMBLE streaming platform with implemented UI components
 - React/TypeScript frontend + Rust backend deployment
-- Development and production environment management
-- Scalable infrastructure for future growth
+- Existing UI components ready for production optimization
+- Development workflow optimization for API integration
+
+Implemented CRUMBLE Components (Requiring Deployment Optimization):
+- ContentSection: Carousel component with horizontal scrolling
+- SearchBar: Interactive search with real-time functionality
+- HeroBanner: Dynamic hero banner with gradient overlays
+- EpisodeCard & MovieCard: Content display components
+- Sidebar: Navigation component with responsive design
+- CSS Modules: Optimized styling system
 
 Infrastructure Requirements:
 Development Environment:
-- Docker Compose for local development
-- Hot reloading for frontend (Vite HMR)
-- Auto-restart for Rust backend (cargo-watch)
-- Local database setup (SQLite/PostgreSQL)
-- Development proxy configuration
+- Docker Compose optimized for CRUMBLE development
+- Hot reloading for existing UI components (Vite HMR)
+- Auto-restart for Rust backend development (cargo-watch)
+- Local database setup for TMDB integration testing
+- Development proxy for API integration
 
 Production Environment:
-- Nginx reverse proxy configuration
+- Nginx reverse proxy for React/Rust serving
 - SSL/TLS certificate management
-- Environment variable management
-- Database connection pooling
-- Static asset serving with CDN
+- Environment variable management for TMDB API
+- Database connection pooling for user data
+- Static asset serving with CDN for images
 
 Build & Deployment:
-- Frontend: Vite production build with optimization
-- Backend: Rust release build with minimal size
-- Automated testing before deployment
-- Zero-downtime deployment strategy
-- Rollback capabilities
+- Frontend: Vite production build with component optimization
+- Backend: Rust release build for TMDB proxy endpoints
+- Automated testing for existing UI components
+- Zero-downtime deployment for CRUMBLE platform
+- Rollback capabilities for component updates
 
 Monitoring & Logging:
-- Application performance monitoring
-- Error tracking and alerting
-- Resource usage monitoring
+- Application performance monitoring for UI components
+- Error tracking for search and carousel functionality
+- Resource usage monitoring for TMDB API integration
+- Component-specific performance metrics
 - Security monitoring and intrusion detection
 - Backup and disaster recovery
 
@@ -631,68 +794,105 @@ Security Configuration:
 - API key and secret management
 
 Deliverables:
-- Complete development environment setup
-- Production deployment configuration
-- CI/CD pipeline with automated testing
-- Monitoring and alerting system
-- Security hardening and best practices
+- Optimized development environment for CRUMBLE
+- Production-ready deployment configuration
+- Monitoring setup for UI components and API integration
+- Documentation for deployment and maintenance procedures
 ```
 
 ---
 
 ## Execution Workflow
 
-### Sequential Development Phases
+### Current Status: CRUMBLE UI Foundation Complete ✅
 
-#### Phase 1: Foundation (Agents 01, 02, 03)
-1. **Project Architect**: Set up project structure and configuration
-2. **Frontend Core**: Create React application foundation
-3. **Design System**: Implement dark theme and component styling
+**Completed Phase 1**: Foundation (Agents 01, 02, 03)
+1. **Project Architect**: ✅ Project structure and configuration complete
+2. **Frontend Core**: ✅ React application with CRUMBLE UI components
+3. **Design System**: ✅ Dark theme and component styling implemented
 
-#### Phase 2: Core Development (Agents 04, 05, 06)
-4. **API Integration**: Integrate TMDB and Stremio services
-5. **Backend API**: Build Rust server and internal endpoints
-6. **State Management**: Implement React state architecture
+**Implemented CRUMBLE Components**:
+- ContentSection with horizontal carousel functionality
+- SearchBar with interactive search capabilities
+- HeroBanner with dynamic content and gradient overlays
+- EpisodeCard and MovieCard for content display
+- Sidebar navigation with responsive design
+- Complete CSS module system with dark theme
 
-#### Phase 3: Quality & Deployment (Agents 07, 08)
-7. **Performance & Testing**: Optimize performance and implement testing
-8. **DevOps & Deployment**: Set up deployment and monitoring
+### Next Priority Phases
+
+#### Phase 2: Data Integration (HIGH PRIORITY)
+1. **API Integration** (IMMEDIATE): Replace mock data with real TMDB integration
+2. **Backend API** (IMMEDIATE): Create Rust TMDB proxy endpoints
+3. **State Management** (HIGH): Integrate state with existing UI components
+
+#### Phase 3: Quality & Optimization (MEDIUM PRIORITY)
+4. **Performance & Testing** (NEXT): Test and optimize existing components
+5. **DevOps & Deployment** (FUTURE): Production deployment setup
 
 ### Cross-Agent Coordination
 
-#### Daily Standups
-- Each agent reports progress on current tasks
-- Identify blockers and dependencies
-- Coordinate integration points between agents
+#### Current Focus: TMDB Integration with Existing UI
+- **API Integration Agent**: Replace mock data in existing components
+- **Backend API Agent**: Create TMDB proxy endpoints for frontend consumption
+- **State Management Agent**: Integrate real data flow with UI components
+- **Performance & Testing Agent**: Test existing components with real data
 
-#### Integration Points
-- **Frontend ↔ Design**: Component styling and theme integration
-- **Frontend ↔ State**: Component state management integration
-- **API Integration ↔ Backend**: Service coordination and data flow
-- **Backend ↔ State**: Authentication and data persistence
-- **Performance ↔ All**: Testing and optimization across all components
-- **DevOps ↔ All**: Environment setup and deployment coordination
+#### Critical Integration Points
+- **API Integration ↔ Frontend Components**: 
+  - ContentSection: Real movie/episode data from TMDB
+  - SearchBar: Live search functionality with TMDB API
+  - HeroBanner: Dynamic content from TMDB popular/trending
+  - MovieCard/EpisodeCard: Real metadata and images
 
-#### Quality Gates
-- Code review between related agents
-- Integration testing at phase boundaries
-- Performance validation before deployment
-- Security review for all external integrations
+- **Backend API ↔ Frontend**: 
+  - TMDB proxy endpoints for all existing UI components
+  - Rate limiting and caching for optimal performance
+  - Error handling for API failures
+
+- **State Management ↔ UI Components**:
+  - Search state integration with SearchBar
+  - Content loading states for carousels
+  - Hero banner content management
+  - User interaction state (favorites, watchlist)
+
+#### Quality Gates for Current Phase
+- Real data integration testing with existing components
+- Performance validation with TMDB API calls
+- Error handling verification for all UI components
+- Cross-browser testing with real data
 
 ---
 
 ## Success Metrics
 
-### Technical Metrics
-- **Performance**: Lighthouse score 90+
-- **Quality**: Test coverage 80%+
-- **Security**: Zero critical vulnerabilities
-- **Accessibility**: WCAG 2.1 AA compliance
+### Current CRUMBLE Platform Status
+- ✅ **UI Foundation**: Complete with all core components
+- ✅ **Design System**: Dark theme and responsive layout implemented
+- ✅ **Component Architecture**: Modular CSS and React components
+- 🔄 **Data Integration**: In progress - TMDB API integration
+- ⏳ **Backend Services**: Pending - Rust TMDB proxy development
+- ⏳ **State Management**: Pending - Real data flow integration
 
-### User Experience Metrics
-- **Load Time**: < 2.5s first contentful paint
-- **Responsiveness**: < 100ms interaction response
-- **Reliability**: 99.9% uptime
+### Technical Metrics (Target Goals)
+- **Performance**: Lighthouse score 90+ (with real TMDB data)
+- **Quality**: Test coverage 80%+ for all existing components
+- **Security**: Zero critical vulnerabilities in TMDB integration
+- **Accessibility**: WCAG 2.1 AA compliance for all UI components
+
+### User Experience Metrics (CRUMBLE Platform)
+- **Load Time**: < 2.5s first contentful paint with TMDB images
+- **Responsiveness**: < 100ms interaction response for search and carousel
+- **Search Performance**: < 300ms debounced TMDB search results
+- **Carousel Smoothness**: 60fps horizontal scrolling performance
+- **Image Loading**: Progressive loading with WebP/AVIF optimization
+
+### Integration Success Criteria
+- **Real Data Display**: All components showing live TMDB content
+- **Search Functionality**: Working real-time search with TMDB API
+- **Error Handling**: Graceful fallbacks for API failures
+- **Performance**: No degradation with real data vs mock data
+- **Cross-browser**: Consistent experience across Chrome, Firefox, Safari
 - **Compatibility**: Support for all major browsers
 
 ### Development Metrics
