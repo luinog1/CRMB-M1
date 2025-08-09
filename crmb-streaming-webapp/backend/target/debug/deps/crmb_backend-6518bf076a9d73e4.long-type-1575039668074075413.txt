@@ -1,0 +1,2 @@
+fn(axum::extract::Query<{type error}>, axum::extract::State<AppState>, std::option::Option<UserContext>) -> impl futures::Future<Output = Result<axum::Json<{type error}>, AppError>> {tv::discover_tv}
+fn(axum::extract::Query<{type error}>, axum::extract::State<AppState>, std::option::Option<UserContext>) -> impl futures::Future<Output = Result<axum::Json<{type error}>, AppError>> {tv::discover_tv}: Handler<_, _>

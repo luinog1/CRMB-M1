@@ -1,0 +1,2 @@
+fn(axum::extract::State<{type error}>, Extension<models::auth::TokenClaims>, axum::Json<{type error}>) -> impl futures::Future<Output = impl IntoResponse> {update_profile}
+fn(axum::extract::State<{type error}>, Extension<models::auth::TokenClaims>, axum::Json<{type error}>) -> impl futures::Future<Output = impl IntoResponse> {update_profile}: Handler<_, _>

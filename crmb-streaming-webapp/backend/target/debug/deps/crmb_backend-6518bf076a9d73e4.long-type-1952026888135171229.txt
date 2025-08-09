@@ -1,0 +1,2 @@
+fn(axum::extract::Query<TrendingQuery>, axum::extract::State<AppState>, std::option::Option<UserContext>) -> impl futures::Future<Output = Result<axum::Json<{type error}>, AppError>> {get_trending_tv}
+fn(axum::extract::Query<TrendingQuery>, axum::extract::State<AppState>, std::option::Option<UserContext>) -> impl futures::Future<Output = Result<axum::Json<{type error}>, AppError>> {get_trending_tv}: Handler<_, _>

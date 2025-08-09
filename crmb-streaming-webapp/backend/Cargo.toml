@@ -1,0 +1,63 @@
+[package]
+name = "crmb-backend"
+version = "2.0.0"
+edition = "2021"
+authors = ["CRMB Team"]
+description = "High-performance Rust backend for CRMB Streaming WebApp with TMDB API proxy and Stremio addon protocol support"
+
+[dependencies]
+# Core web framework
+axum = { version = "0.7", features = ["macros"] }
+tokio = { version = "1.0", features = ["full"] }
+tower = { version = "0.4", features = ["timeout", "util"] }
+tower-http = { version = "0.5", features = ["cors", "fs", "trace", "compression-gzip", "limit"] }
+
+# HTTP client for TMDB API
+reqwest = { version = "0.11", features = ["json", "gzip"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Database
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite", "chrono", "uuid"] }
+
+# Authentication
+jsonwebtoken = "9.0"
+bcrypt = "0.15"
+
+# Utilities
+uuid = { version = "1.0", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+dashmap = "5.0"
+once_cell = "1.0"
+url = "2.4"
+regex = "1.10"
+
+# Rate limiting and caching
+tokio-util = "0.7"
+futures = "0.3"
+
+# Environment variables
+dotenv = "0.15"
+
+# Validation
+validator = { version = "0.16", features = ["derive"] }
+lazy_static = "1.4"
+async-trait = "0.1"
+
+[dev-dependencies]
+tokio-test = "0.4"
+httpmock = "0.6"
+
+[[bin]]
+name = "crmb-backend"
+path = "src/main.rs"

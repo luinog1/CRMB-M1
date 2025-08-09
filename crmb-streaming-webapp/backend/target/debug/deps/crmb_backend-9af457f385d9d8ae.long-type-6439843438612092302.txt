@@ -1,0 +1,2 @@
+fn(axum::extract::State<AppState>, Extension<models::auth::TokenClaims>, axum::Json<models::user::AddToWatchlistRequest>) -> impl futures::Future<Output = impl IntoResponse> {add_to_watchlist}
+fn(axum::extract::State<AppState>, Extension<models::auth::TokenClaims>, axum::Json<models::user::AddToWatchlistRequest>) -> impl futures::Future<Output = impl IntoResponse> {add_to_watchlist}: Handler<_, _>

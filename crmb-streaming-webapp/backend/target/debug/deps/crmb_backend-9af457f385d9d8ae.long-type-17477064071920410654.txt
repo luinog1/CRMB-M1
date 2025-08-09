@@ -1,0 +1,2 @@
+fn(axum::extract::State<AppState>, Extension<models::auth::TokenClaims>, axum::extract::Path<(u32, std::string::String)>) -> impl futures::Future<Output = impl IntoResponse> {remove_from_watchlist}
+fn(axum::extract::State<AppState>, Extension<models::auth::TokenClaims>, axum::extract::Path<(u32, std::string::String)>) -> impl futures::Future<Output = impl IntoResponse> {remove_from_watchlist}: Handler<_, _>

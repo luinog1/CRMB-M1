@@ -1,0 +1,2 @@
+fn(axum::extract::State<{type error}>, Extension<models::auth::TokenClaims>) -> impl futures::Future<Output = impl IntoResponse> {get_preferences}
+fn(axum::extract::State<{type error}>, Extension<models::auth::TokenClaims>) -> impl futures::Future<Output = impl IntoResponse> {get_preferences}: Handler<_, _>

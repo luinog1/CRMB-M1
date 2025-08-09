@@ -1,0 +1,2 @@
+fn(axum::extract::State<AppState>, Extension<models::auth::TokenClaims>, axum::Json<models::user::UpdateUserRequest>) -> impl futures::Future<Output = impl IntoResponse> {update_profile}
+fn(axum::extract::State<AppState>, Extension<models::auth::TokenClaims>, axum::Json<models::user::UpdateUserRequest>) -> impl futures::Future<Output = impl IntoResponse> {update_profile}: Handler<_, _>

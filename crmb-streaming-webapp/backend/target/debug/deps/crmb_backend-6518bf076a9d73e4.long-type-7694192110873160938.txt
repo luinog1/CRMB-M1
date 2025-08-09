@@ -1,0 +1,2 @@
+fn(axum::extract::Query<PopularQuery>, axum::extract::State<AppState>, std::option::Option<UserContext>) -> impl futures::Future<Output = Result<axum::Json<{type error}>, AppError>> {get_popular_tv}
+fn(axum::extract::Query<PopularQuery>, axum::extract::State<AppState>, std::option::Option<UserContext>) -> impl futures::Future<Output = Result<axum::Json<{type error}>, AppError>> {get_popular_tv}: Handler<_, _>

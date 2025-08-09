@@ -1,0 +1,2 @@
+fn(axum::extract::State<{type error}>, Extension<models::auth::TokenClaims>, axum::extract::Query<PaginationQuery>) -> impl futures::Future<Output = impl IntoResponse> {get_watchlist}
+fn(axum::extract::State<{type error}>, Extension<models::auth::TokenClaims>, axum::extract::Query<PaginationQuery>) -> impl futures::Future<Output = impl IntoResponse> {get_watchlist}: Handler<_, _>

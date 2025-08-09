@@ -1,0 +1,2 @@
+fn(axum::extract::Path<u32>, axum::extract::State<AppState>, std::option::Option<UserContext>) -> impl futures::Future<Output = Result<axum::Json<models::tmdb::MovieDetails>, AppError>> {get_movie}
+fn(axum::extract::Path<u32>, axum::extract::State<AppState>, std::option::Option<UserContext>) -> impl futures::Future<Output = Result<axum::Json<models::tmdb::MovieDetails>, AppError>> {get_movie}: Handler<_, _>
