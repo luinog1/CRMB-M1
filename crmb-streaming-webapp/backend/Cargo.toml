@@ -41,6 +41,7 @@ dashmap = "5.0"
 once_cell = "1.0"
 url = "2.4"
 regex = "1.10"
+rand = "0.8"
 
 # Rate limiting and caching
 tokio-util = "0.7"

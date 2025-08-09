@@ -32,9 +32,11 @@ pub async fn search_movies(
     State(state): State<AppState>,
     OptionalUserContext(user_context): OptionalUserContext,
 ) -> AppResult<Json<PaginatedResponse<Movie>>> {
-    let query = params.query.ok_or_else(|| AppError::BadRequest {
-        message: "Search query is required".to_string(),
-    })?;
+    let query = if params.query.is_empty() {
+        return Err(AppError::BadRequest("Search query is required".to_string()));
+    } else {
+        params.query
+    };
     
     let page = params.page.unwrap_or(1);
     
@@ -48,10 +50,7 @@ pub async fn search_movies(
         .await
         .map_err(|e| {
             error!("Failed to search movies: {}", e);
-            AppError::ExternalApi {
-                service: "TMDB".to_string(),
-                message: "Failed to search movies".to_string(),
-            }
+            AppError::ExternalApi(ExternalApiError::TmdbError("Failed to search movies".to_string()))
         })?;
     
     Ok(Json(result))
@@ -75,14 +74,8 @@ pub async fn get_movie(
         .map_err(|e| {
             error!("Failed to get movie details for id {}: {}", movie_id, e);
             match e {
-                crate::services::tmdb::TmdbError::NotFound(_) => AppError::NotFound {
-                    resource: "Movie".to_string(),
-                    id: movie_id.to_string(),
-                },
-                _ => AppError::ExternalApi {
-                    service: "TMDB".to_string(),
-                    message: "Failed to get movie details".to_string(),
-                },
+                crate::services::tmdb::TmdbError::NotFound(_) => AppError::NotFound(format!("Movie with id {} not found", movie_id)),
+                _ => AppError::ExternalApi(ExternalApiError::TmdbError("Failed to get movie details".to_string())),
             }
         })?;
     
@@ -109,10 +102,7 @@ pub async fn get_trending_movies(
         .await
         .map_err(|e| {
             error!("Failed to get trending movies: {}", e);
-            AppError::ExternalApi {
-                service: "TMDB".to_string(),
-                message: "Failed to get trending movies".to_string(),
-            }
+            AppError::ExternalApi(ExternalApiError::TmdbError("Failed to get trending movies".to_string()))
         })?;
     
     Ok(Json(result))
@@ -138,10 +128,7 @@ pub async fn get_popular_movies(
         .await
         .map_err(|e| {
             error!("Failed to get popular movies: {}", e);
-            AppError::ExternalApi {
-                service: "TMDB".to_string(),
-                message: "Failed to get popular movies".to_string(),
-            }
+            AppError::ExternalApi(ExternalApiError::TmdbError("Failed to get popular movies".to_string()))
         })?;
     
     Ok(Json(result))
@@ -166,10 +153,7 @@ pub async fn discover_movies(
         .await
         .map_err(|e| {
             error!("Failed to discover movies: {}", e);
-            AppError::ExternalApi {
-                service: "TMDB".to_string(),
-                message: "Failed to discover movies".to_string(),
-            }
+            AppError::ExternalApi(ExternalApiError::TmdbError("Failed to discover movies".to_string()))
         })?;
     
     Ok(Json(result))

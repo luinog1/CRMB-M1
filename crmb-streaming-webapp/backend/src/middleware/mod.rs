@@ -166,8 +166,6 @@ pub async fn request_timeout(
 pub fn compression_layer() -> tower_http::compression::CompressionLayer {
     tower_http::compression::CompressionLayer::new()
         .gzip(true)
-        .deflate(true)
-        .br(true)
 }
 
 /// Middleware to limit request body size

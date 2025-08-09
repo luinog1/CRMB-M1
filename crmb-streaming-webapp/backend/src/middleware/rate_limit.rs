@@ -32,18 +32,7 @@ use crate::{
 
 // RateLimitConfig is imported from services::rate_limiter
 
-/// Rate limit types
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum RateLimitType {
-    /// Limit by IP address
-    ByIp,
-    /// Limit by user ID
-    ByUser,
-    /// Limit by endpoint
-    ByEndpoint,
-    /// Global limit
-    Global,
-}
+
 
 /// Rate limit window
 #[derive(Debug, Clone)]
@@ -132,22 +121,19 @@ impl MemoryRateLimitStore {
         &self,
         key: &str,
         config: &RateLimitConfig,
-    ) -> RateLimitResult {
-        let window_duration = Duration::from_secs(config.window_duration_secs);
+    ) -> crate::services::rate_limiter::RateLimitResult {
+        let window_duration = config.time_window;
         
         let mut windows = self.windows.write().unwrap();
         let window = windows
             .entry(key.to_string())
             .or_insert_with(|| RateLimitWindow::new(window_duration));
         
-        if window.can_proceed(config.requests_per_window) {
+        if window.can_proceed(config.max_requests) {
             window.increment();
-            RateLimitResult::Allowed {
-                remaining: window.remaining(config.requests_per_window),
-                reset_time: window.reset_time(),
-            }
+            crate::services::rate_limiter::RateLimitResult::Allowed
         } else {
-            RateLimitResult::Limited {
+            crate::services::rate_limiter::RateLimitResult::Denied {
                 retry_after: window.reset_time(),
             }
         }
@@ -176,40 +162,40 @@ impl RateLimitState {
         configs.insert(
             "/api/auth/login".to_string(),
             RateLimitConfig {
-                requests_per_window: 5,
-                window_duration_secs: 300, // 5 minutes
-                burst_size: 2,
-                limit_type: RateLimitType::ByIp,
+                max_requests: 5,
+                time_window: Duration::from_secs(300), // 5 minutes
+                min_interval: None,
+                burst_protection: true,
             },
         );
         
         configs.insert(
             "/api/auth/register".to_string(),
             RateLimitConfig {
-                requests_per_window: 3,
-                window_duration_secs: 3600, // 1 hour
-                burst_size: 1,
-                limit_type: RateLimitType::ByIp,
+                max_requests: 3,
+                time_window: Duration::from_secs(3600), // 1 hour
+                min_interval: None,
+                burst_protection: true,
             },
         );
         
         configs.insert(
             "/api/tmdb".to_string(),
             RateLimitConfig {
-                requests_per_window: 100,
-                window_duration_secs: 60, // 1 minute
-                burst_size: 10,
-                limit_type: RateLimitType::ByUser,
+                max_requests: 100,
+                time_window: Duration::from_secs(60), // 1 minute
+                min_interval: None,
+                burst_protection: true,
             },
         );
         
         configs.insert(
             "/api/stremio".to_string(),
             RateLimitConfig {
-                requests_per_window: 50,
-                window_duration_secs: 60, // 1 minute
-                burst_size: 5,
-                limit_type: RateLimitType::ByUser,
+                max_requests: 50,
+                time_window: Duration::from_secs(60), // 1 minute
+                min_interval: None,
+                burst_protection: true,
             },
         );
         
@@ -217,11 +203,11 @@ impl RateLimitState {
             store: Arc::new(MemoryRateLimitStore::new()),
             configs: Arc::new(configs),
             global_config: RateLimitConfig {
-                requests_per_window: 1000,
-                window_duration_secs: 3600, // 1 hour
-                burst_size: 50,
-                limit_type: RateLimitType::ByIp,
-            },
+            max_requests: 1000,
+            time_window: Duration::from_secs(3600),
+            min_interval: None,
+            burst_protection: true,
+        },
         }
     }
     
@@ -230,10 +216,10 @@ impl RateLimitState {
             store: Arc::new(MemoryRateLimitStore::new()),
             configs: Arc::new(configs),
             global_config: RateLimitConfig {
-                requests_per_window: 1000,
-                window_duration_secs: 3600,
-                burst_size: 50,
-                limit_type: RateLimitType::ByIp,
+                max_requests: 1000,
+                time_window: Duration::from_secs(3600),
+                min_interval: None,
+                burst_protection: true,
             },
         }
     }
@@ -252,16 +238,17 @@ pub async fn global_rate_limit(
     let result = rate_limit_state.store.check_rate_limit(&key, &rate_limit_state.global_config);
     
     match result {
-        RateLimitResult::Allowed { remaining, reset_time } => {
-            let mut response = next.run(request).await;
-            add_rate_limit_headers(&mut response, remaining, reset_time);
+        crate::services::rate_limiter::RateLimitResult::Allowed => {
+            let response = next.run(request).await;
             Ok(response)
         }
-        RateLimitResult::Limited { retry_after } => {
+        crate::services::rate_limiter::RateLimitResult::Denied { retry_after } => {
             warn!("Global rate limit exceeded for IP: {}", ip);
-            Err(AppError::TooManyRequests {
-                retry_after: retry_after.as_secs(),
-            })
+            Err(AppError::TooManyRequests(format!("Rate limit exceeded, retry after {} seconds", retry_after.as_secs())))
+        }
+        crate::services::rate_limiter::RateLimitResult::Delayed { .. } => {
+            let response = next.run(request).await;
+            Ok(response)
         }
     }
 }
@@ -285,26 +272,26 @@ pub async fn endpoint_rate_limit(
     let result = rate_limit_state.store.check_rate_limit(&key, config);
     
     match result {
-        RateLimitResult::Allowed { remaining, reset_time } => {
-            debug!(
-                "Rate limit check passed for key: {}, remaining: {}",
-                key, remaining
-            );
-            let mut response = next.run(request).await;
-            add_rate_limit_headers(&mut response, remaining, reset_time);
-            Ok(response)
+            RateLimitResult::Allowed => {
+                debug!(
+                    "Rate limit check passed for key: {}",
+                    key
+                );
+                let mut response = next.run(request).await;
+                Ok(response)
+            }
+            RateLimitResult::Denied { retry_after } => {
+                warn!(
+                    "Rate limit exceeded for key: {}, retry after: {}s",
+                    key,
+                    retry_after.as_secs()
+                );
+                Err(AppError::TooManyRequests(format!("Rate limit exceeded, retry after {} seconds", retry_after.as_secs())))
+            }
+            RateLimitResult::Delayed { .. } => {
+                Ok(next.run(request).await)
+            }
         }
-        RateLimitResult::Limited { retry_after } => {
-            warn!(
-                "Rate limit exceeded for key: {}, retry after: {}s",
-                key,
-                retry_after.as_secs()
-            );
-            Err(AppError::TooManyRequests {
-                retry_after: retry_after.as_secs(),
-            })
-        }
-    }
 }
 
 /// Authentication-specific rate limiting
@@ -324,28 +311,28 @@ pub async fn auth_rate_limit(
         let config = rate_limit_state.configs
             .get(path)
             .unwrap_or(&RateLimitConfig {
-                requests_per_window: 10,
-                window_duration_secs: 300, // 5 minutes
-                burst_size: 2,
-                limit_type: RateLimitType::ByIp,
+                max_requests: 10,
+                time_window: Duration::from_secs(300), // 5 minutes
+                min_interval: Some(Duration::from_millis(500)),
+                burst_protection: true,
             });
         
         let result = rate_limit_state.store.check_rate_limit(&key, config);
         
         match result {
-            RateLimitResult::Allowed { remaining, reset_time } => {
+            RateLimitResult::Allowed => {
                 let mut response = next.run(request).await;
-                add_rate_limit_headers(&mut response, remaining, reset_time);
                 Ok(response)
             }
-            RateLimitResult::Limited { retry_after } => {
+            RateLimitResult::Denied { retry_after } => {
                 warn!(
                     "Auth rate limit exceeded for IP: {}, path: {}",
                     ip, path
                 );
-                Err(AppError::TooManyRequests {
-                    retry_after: retry_after.as_secs(),
-                })
+                Err(AppError::TooManyRequests(format!("Rate limit exceeded, retry after {} seconds", retry_after.as_secs())))
+            }
+            RateLimitResult::Delayed { .. } => {
+                Ok(next.run(request).await)
             }
         }
     } else {
@@ -365,31 +352,30 @@ pub async fn user_rate_limit(
         
         // Find configuration for this endpoint
         let config = find_matching_config(&rate_limit_state.configs, path)
-            .filter(|c| c.limit_type == RateLimitType::ByUser)
             .unwrap_or(&RateLimitConfig {
-                requests_per_window: 200,
-                window_duration_secs: 3600, // 1 hour
-                burst_size: 20,
-                limit_type: RateLimitType::ByUser,
+                max_requests: 200,
+                time_window: Duration::from_secs(3600), // 1 hour
+                min_interval: Some(Duration::from_millis(100)),
+                burst_protection: true,
             });
         
         let key = format!("user:{}:{}", user_context.user.id, path);
         let result = rate_limit_state.store.check_rate_limit(&key, config);
         
         match result {
-            RateLimitResult::Allowed { remaining, reset_time } => {
+            RateLimitResult::Allowed => {
                 let mut response = next.run(request).await;
-                add_rate_limit_headers(&mut response, remaining, reset_time);
                 Ok(response)
             }
-            RateLimitResult::Limited { retry_after } => {
+            RateLimitResult::Denied { retry_after } => {
                 warn!(
                     "User rate limit exceeded for user: {}, path: {}",
                     user_context.user.id, path
                 );
-                Err(AppError::TooManyRequests {
-                    retry_after: retry_after.as_secs(),
-                })
+                Err(AppError::TooManyRequests(format!("Rate limit exceeded, retry after {} seconds", retry_after.as_secs())))
+            }
+            RateLimitResult::Delayed { .. } => {
+                Ok(next.run(request).await)
             }
         }
     } else {
@@ -407,14 +393,20 @@ pub async fn adaptive_rate_limit(
     // TODO: Implement system load monitoring
     let system_load = get_system_load().await;
     
-    // Adjust rate limits based on system load
-    let mut config = rate_limit_state.global_config.clone();
+    // Create adaptive configuration based on system load
+    let mut config = RateLimitConfig {
+        max_requests: 50,
+        time_window: Duration::from_secs(60),
+        min_interval: None,
+        burst_protection: true,
+    };
+    
+    // Adjust limits based on system load
     if system_load > 0.8 {
-        // Reduce rate limits when system is under high load
-        config.requests_per_window = (config.requests_per_window as f32 * 0.5) as u32;
-        warn!("High system load detected, reducing rate limits");
+        config.max_requests = (config.max_requests as f32 * 0.5) as u32;
+        debug!("High system load detected, reducing rate limits");
     } else if system_load > 0.6 {
-        config.requests_per_window = (config.requests_per_window as f32 * 0.75) as u32;
+        config.max_requests = (config.max_requests as f32 * 0.75) as u32;
         debug!("Moderate system load detected, slightly reducing rate limits");
     }
     
@@ -425,15 +417,15 @@ pub async fn adaptive_rate_limit(
     let result = rate_limit_state.store.check_rate_limit(&key, &config);
     
     match result {
-        RateLimitResult::Allowed { remaining, reset_time } => {
-            let mut response = next.run(request).await;
-            add_rate_limit_headers(&mut response, remaining, reset_time);
+        crate::services::rate_limiter::RateLimitResult::Allowed => {
+            let response = next.run(request).await;
             Ok(response)
         }
-        RateLimitResult::Limited { retry_after } => {
-            Err(AppError::TooManyRequests {
-                retry_after: retry_after.as_secs(),
-            })
+        crate::services::rate_limiter::RateLimitResult::Denied { retry_after } => {
+            Err(AppError::TooManyRequests(format!("Rate limit exceeded, retry after {} seconds", retry_after.as_secs())))
+        }
+        crate::services::rate_limiter::RateLimitResult::Delayed { .. } => {
+            Ok(next.run(request).await)
         }
     }
 }
@@ -461,51 +453,15 @@ fn find_matching_config<'a>(
 /// Generate rate limit key based on configuration
 fn generate_rate_limit_key(
     request: &Request,
-    config: &RateLimitConfig,
+    _config: &RateLimitConfig,
     headers: &HeaderMap,
 ) -> Result<String, AppError> {
-    match config.limit_type {
-        RateLimitType::ByIp => {
-            let ip = extract_real_ip(headers).unwrap_or_else(|| "unknown".to_string());
-            Ok(format!("ip:{}", ip))
-        }
-        RateLimitType::ByUser => {
-            if let Some(user_context) = get_user_context(request) {
-                Ok(format!("user:{}", user_context.user.id))
-            } else {
-                // Fallback to IP if no user context
-                let ip = extract_real_ip(headers).unwrap_or_else(|| "unknown".to_string());
-                Ok(format!("ip:{}", ip))
-            }
-        }
-        RateLimitType::ByEndpoint => {
-            let path = request.uri().path();
-            Ok(format!("endpoint:{}", path))
-        }
-        RateLimitType::Global => {
-            Ok("global".to_string())
-        }
-    }
+    // Default to IP-based rate limiting for now
+    let ip = extract_real_ip(headers).unwrap_or_else(|| "unknown".to_string());
+    Ok(format!("ip:{}", ip))
 }
 
-/// Add rate limit headers to response
-fn add_rate_limit_headers(
-    response: &mut Response,
-    remaining: u32,
-    reset_time: Duration,
-) {
-    let headers = response.headers_mut();
-    
-    headers.insert(
-        "x-rate-limit-remaining",
-        remaining.to_string().parse().unwrap(),
-    );
-    
-    headers.insert(
-        "x-rate-limit-reset",
-        reset_time.as_secs().to_string().parse().unwrap(),
-    );
-}
+
 
 /// Get current system load (placeholder implementation)
 async fn get_system_load() -> f32 {
@@ -573,18 +529,18 @@ mod tests {
     fn test_memory_rate_limit_store() {
         let store = MemoryRateLimitStore::new();
         let config = RateLimitConfig {
-            requests_per_window: 5,
-            window_duration_secs: 60,
-            burst_size: 1,
-            limit_type: RateLimitType::ByIp,
+            max_requests: 5,
+            time_window: Duration::from_secs(60),
+            min_interval: None,
+            burst_protection: true,
         };
         
         // Test allowed requests
-        for i in 0..5 {
+        for _ in 0..5 {
             let result = store.check_rate_limit("test_key", &config);
             match result {
-                RateLimitResult::Allowed { remaining, .. } => {
-                    assert_eq!(remaining, 5 - i - 1);
+                crate::services::rate_limiter::RateLimitResult::Allowed => {
+                    // Expected
                 }
                 _ => panic!("Expected allowed result"),
             }
@@ -593,10 +549,10 @@ mod tests {
         // Test rate limit exceeded
         let result = store.check_rate_limit("test_key", &config);
         match result {
-            RateLimitResult::Limited { .. } => {
+            crate::services::rate_limiter::RateLimitResult::Denied { .. } => {
                 // Expected
             }
-            _ => panic!("Expected limited result"),
+            _ => panic!("Expected denied result"),
         }
     }
 
@@ -606,10 +562,10 @@ mod tests {
         configs.insert(
             "/api/auth".to_string(),
             RateLimitConfig {
-                requests_per_window: 5,
-                window_duration_secs: 300,
-                burst_size: 1,
-                limit_type: RateLimitType::ByIp,
+                max_requests: 5,
+                time_window: Duration::from_secs(300),
+                min_interval: None,
+                burst_protection: true,
             },
         );
         
@@ -629,6 +585,6 @@ mod tests {
         
         assert!(state.configs.contains_key("/api/auth/login"));
         assert!(state.configs.contains_key("/api/auth/register"));
-        assert_eq!(state.global_config.requests_per_window, 1000);
+        assert_eq!(state.global_config.max_requests, 1000);
     }
 }

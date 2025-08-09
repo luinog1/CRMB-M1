@@ -12,7 +12,7 @@ use std::time::Duration;
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 
-use crate::models::stremio::*;
+use crate::models::stremio::{Manifest, MetaPreview, MetaDetail, Stream};
 use crate::models::tmdb::{Movie, TvShow, MovieDetails, TvShowDetails};
 use crate::services::cache::{CacheService, CacheKeys, CacheResult};
 use crate::services::tmdb::{TmdbService, SearchParams, DiscoverParams};
@@ -137,26 +137,26 @@ impl StremioService {
         let manifest = Manifest {
             id: "crmb.streaming.webapp".to_string(),
             name: "CRMB Streaming WebApp".to_string(),
-            description: Some("Premium streaming addon for CRMB WebApp".to_string()),
+            description: "Premium streaming addon for CRMB WebApp".to_string(),
             version: "1.0.0".to_string(),
             logo: Some("https://example.com/logo.png".to_string()),
             background: Some("https://example.com/background.jpg".to_string()),
             contact_email: Some("support@crmb.com".to_string()),
             types: vec!["movie".to_string(), "series".to_string()],
             catalogs: vec![
-                Catalog {
+                CatalogDefinition {
                     id: "popular_movies".to_string(),
                     name: "Popular Movies".to_string(),
                     catalog_type: "movie".to_string(),
                     extra: vec![],
                 },
-                Catalog {
+                CatalogDefinition {
                     id: "popular_series".to_string(),
                     name: "Popular Series".to_string(),
                     catalog_type: "series".to_string(),
                     extra: vec![],
                 },
-                Catalog {
+                CatalogDefinition {
                     id: "trending".to_string(),
                     name: "Trending".to_string(),
                     catalog_type: "movie".to_string(),
@@ -165,6 +165,7 @@ impl StremioService {
             ],
             resources: vec!["catalog".to_string(), "meta".to_string(), "stream".to_string()],
             id_prefixes: Some(vec!["tt".to_string()]),
+            behavior_hints: None,
         };
 
         let config = StremioConfig {
@@ -572,112 +573,77 @@ impl StremioService {
 
     /// Convert TMDB Movie to Stremio MetaPreview
     fn convert_movie_to_meta_preview(&self, movie: Movie) -> MetaPreview {
+        let release_date = movie.release_date.clone();
         MetaPreview {
             id: format!("tmdb:{}", movie.id),
-            media_type: "movie".to_string(),
+            meta_type: "movie".to_string(),
             name: movie.title,
             poster: movie.poster_path.map(|path| format!("https://image.tmdb.org/t/p/w500{}", path)),
             background: movie.backdrop_path.map(|path| format!("https://image.tmdb.org/t/p/w1280{}", path)),
             logo: None,
             description: movie.overview,
-            release_info: movie.release_date,
-            runtime: None,
-            released: movie.release_date,
+            release_info: release_date.clone(),
+            imdb_rating: Some(movie.vote_average),
+            genres: None,
+            year: release_date.as_ref().and_then(|date| 
+                date.split('-').next().and_then(|year| year.parse().ok())
+            ),
             poster_shape: Some("poster".to_string()),
-            links: None,
-            trailer_streams: None,
         }
     }
 
     /// Convert TMDB TvShow to Stremio MetaPreview
     fn convert_tv_to_meta_preview(&self, tv_show: TvShow) -> MetaPreview {
+        let first_air_date = tv_show.first_air_date.clone();
         MetaPreview {
             id: format!("tmdb:{}", tv_show.id),
-            media_type: "series".to_string(),
+            meta_type: "series".to_string(),
             name: tv_show.name,
             poster: tv_show.poster_path.map(|path| format!("https://image.tmdb.org/t/p/w500{}", path)),
             background: tv_show.backdrop_path.map(|path| format!("https://image.tmdb.org/t/p/w1280{}", path)),
             logo: None,
             description: tv_show.overview,
-            release_info: tv_show.first_air_date.clone(),
-            runtime: None,
-            released: tv_show.first_air_date,
+            release_info: first_air_date.clone(),
+            imdb_rating: Some(tv_show.vote_average),
+            genres: None, // TvShow struct has genre_ids, not genres
+            year: first_air_date.as_ref().and_then(|date| 
+                date.split('-').next().and_then(|year| year.parse().ok())
+            ),
             poster_shape: Some("poster".to_string()),
-            links: None,
-            trailer_streams: None,
         }
     }
 
     /// Convert TMDB MovieDetails to Stremio MetaDetail
     fn convert_movie_to_meta_detail(&self, movie: MovieDetails) -> MetaDetail {
-        let videos = movie.videos.as_ref()
-            .map(|v| v.results.iter()
-                .filter(|video| video.video_type == "Trailer" && video.site == "YouTube")
-                .map(|video| Video {
-                    id: video.id.clone(),
-                    title: video.name.clone(),
-                    released: None,
-                    thumbnail: Some(format!("https://img.youtube.com/vi/{}/maxresdefault.jpg", video.key)),
-                    streams: vec![Stream {
-                        url: Some(format!("https://www.youtube.com/watch?v={}", video.key)),
-                        title: Some(video.name.clone()),
-                        subtitle_tracks: None,
-                        behavior_hints: None,
-                    }],
-                    available: true,
-                    episode: None,
-                    season: None,
-                })
-                .collect::<Vec<_>>())
-            .unwrap_or_default();
+        let videos: Vec<Video> = vec![];
+        let release_date = movie.release_date.clone();
 
         MetaDetail {
             id: format!("tmdb:{}", movie.id),
-            media_type: "movie".to_string(),
+            meta_type: "movie".to_string(),
             name: movie.title,
             poster: movie.poster_path.map(|path| format!("https://image.tmdb.org/t/p/w500{}", path)),
             background: movie.backdrop_path.map(|path| format!("https://image.tmdb.org/t/p/w1280{}", path)),
             logo: None,
             description: movie.overview,
-            release_info: movie.release_date.clone(),
+            release_info: release_date.clone(),
             runtime: movie.runtime.map(|r| format!("{} min", r)),
-            released: movie.release_date,
-            poster_shape: Some("poster".to_string()),
-            imdb_rating: movie.vote_average.map(|r| format!("{:.1}", r)),
-            genre: movie.genres.map(|genres| 
-                genres.into_iter().map(|g| g.name).collect::<Vec<_>>().join(", ")
-            ),
-            cast: movie.credits.as_ref().map(|credits| 
-                credits.cast.iter()
-                    .take(10)
-                    .map(|actor| actor.name.clone())
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            ),
-            director: movie.credits.as_ref().and_then(|credits| 
-                credits.crew.iter()
-                    .find(|crew| crew.job == "Director")
-                    .map(|director| director.name.clone())
-            ),
-            writer: movie.credits.as_ref().map(|credits| 
-                credits.crew.iter()
-                    .filter(|crew| crew.job == "Writer" || crew.job == "Screenplay")
-                    .take(3)
-                    .map(|writer| writer.name.clone())
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            ),
-            year: movie.release_date.as_ref().and_then(|date| 
+
+
+            imdb_rating: Some(movie.vote_average),
+            genres: Some(movie.genres.into_iter().map(|g| g.name).collect::<Vec<_>>()),
+            cast: None,
+            director: None,
+            writer: None,
+            year: release_date.as_ref().and_then(|date| 
                 date.split('-').next().and_then(|year| year.parse().ok())
             ),
-            country: movie.production_countries.map(|countries| 
-                countries.into_iter().map(|c| c.name).collect::<Vec<_>>().join(", ")
-            ),
+            country: movie.production_countries.into_iter().next().map(|c| c.name),
             language: Some(movie.original_language),
-            awards: None,
+
             website: movie.homepage,
             links: None,
-            videos: if videos.is_empty() { None } else { Some(videos) },
+            videos: None,
             trailer_streams: None,
             behavior_hints: None,
         }
@@ -685,65 +651,34 @@ impl StremioService {
 
     /// Convert TMDB TvShowDetails to Stremio MetaDetail
     fn convert_tv_to_meta_detail(&self, tv_show: TvShowDetails) -> MetaDetail {
-        let videos = tv_show.videos.as_ref()
-            .map(|v| v.results.iter()
-                .filter(|video| video.video_type == "Trailer" && video.site == "YouTube")
-                .map(|video| Video {
-                    id: video.id.clone(),
-                    title: video.name.clone(),
-                    released: None,
-                    thumbnail: Some(format!("https://img.youtube.com/vi/{}/maxresdefault.jpg", video.key)),
-                    streams: vec![Stream {
-                        url: Some(format!("https://www.youtube.com/watch?v={}", video.key)),
-                        title: Some(video.name.clone()),
-                        subtitle_tracks: None,
-                        behavior_hints: None,
-                    }],
-                    available: true,
-                    episode: None,
-                    season: None,
-                })
-                .collect::<Vec<_>>())
-            .unwrap_or_default();
+        let videos: Vec<Video> = vec![];
+        let first_air_date = tv_show.first_air_date.clone();
 
         MetaDetail {
             id: format!("tmdb:{}", tv_show.id),
-            media_type: "series".to_string(),
+            meta_type: "series".to_string(),
             name: tv_show.name,
             poster: tv_show.poster_path.map(|path| format!("https://image.tmdb.org/t/p/w500{}", path)),
             background: tv_show.backdrop_path.map(|path| format!("https://image.tmdb.org/t/p/w1280{}", path)),
             logo: None,
             description: tv_show.overview,
-            release_info: tv_show.first_air_date.clone(),
-            runtime: tv_show.episode_run_time.and_then(|times| times.first().map(|r| format!("{} min", r))),
-            released: tv_show.first_air_date,
-            poster_shape: Some("poster".to_string()),
-            imdb_rating: tv_show.vote_average.map(|r| format!("{:.1}", r)),
-            genre: tv_show.genres.map(|genres| 
-                genres.into_iter().map(|g| g.name).collect::<Vec<_>>().join(", ")
-            ),
-            cast: tv_show.credits.as_ref().map(|credits| 
-                credits.cast.iter()
-                    .take(10)
-                    .map(|actor| actor.name.clone())
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            ),
+            release_info: first_air_date.clone(),
+            runtime: tv_show.episode_run_time.first().map(|r| format!("{} min", r)),
+
+
+            imdb_rating: Some(tv_show.vote_average),
+            genres: Some(tv_show.genres.into_iter().map(|g| g.name).collect::<Vec<_>>()),
+            cast: None,
             director: None, // TV shows don't typically have a single director
-            writer: tv_show.created_by.map(|creators| 
-                creators.into_iter().map(|c| c.name).collect::<Vec<_>>().join(", ")
-            ),
-            year: tv_show.first_air_date.as_ref().and_then(|date| 
+            writer: Some(tv_show.created_by.into_iter().map(|c| c.name).collect::<Vec<_>>()),
+            year: first_air_date.as_ref().and_then(|date| 
                 date.split('-').next().and_then(|year| year.parse().ok())
             ),
-            country: tv_show.production_countries.map(|countries| 
-                countries.into_iter().map(|c| c.name).collect::<Vec<_>>().join(", ")
-            ),
+            country: tv_show.origin_country.into_iter().next(),
             language: Some(tv_show.original_language),
-            awards: None,
             website: tv_show.homepage,
             links: None,
-            videos: if videos.is_empty() { None } else { Some(videos) },
+            videos: None,
             trailer_streams: None,
             behavior_hints: None,
         }
@@ -768,7 +703,7 @@ struct StreamResponse {
 impl Default for StremioConfig {
     fn default() -> Self {
         Self {
-            manifest: Manifest::default(),
+            manifest: Manifest::new_crmb_addon(),
             enable_cache: true,
             cache_ttl: Duration::from_secs(3600), // 1 hour
             max_catalog_items: 100,

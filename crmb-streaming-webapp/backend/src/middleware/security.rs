@@ -235,18 +235,14 @@ fn validate_path_traversal(uri: &Uri) -> AppResult<()> {
                 "Path traversal attempt detected: {} in path: {}",
                 pattern, path
             );
-            return Err(AppError::BadRequest {
-                message: "Invalid path detected".to_string(),
-            });
+            return Err(AppError::BadRequest("Invalid path detected".to_string()));
         }
     }
     
     // Check for null bytes
     if path.contains('\0') {
         warn!("Null byte in path detected: {}", path);
-        return Err(AppError::BadRequest {
-            message: "Invalid characters in path".to_string(),
-        });
+        return Err(AppError::BadRequest("Invalid characters in path".to_string()));
     }
     
     Ok(())
@@ -286,9 +282,7 @@ fn validate_sql_injection(uri: &Uri) -> AppResult<()> {
                 "SQL injection attempt detected: {} in URI: {}",
                 pattern, uri
             );
-            return Err(AppError::BadRequest {
-                message: "Invalid request parameters".to_string(),
-            });
+            return Err(AppError::BadRequest("Invalid request parameters".to_string()));
         }
     }
     
@@ -307,9 +301,7 @@ fn validate_user_agent(headers: &HeaderMap, config: &SecurityConfig) -> AppResul
                     "Blocked user agent detected: {} (blocked pattern: {})",
                     user_agent, blocked_agent
                 );
-                return Err(AppError::Forbidden {
-                    message: "Access denied".to_string(),
-                });
+                return Err(AppError::Forbidden("Access denied".to_string()));
             }
         }
         
@@ -330,9 +322,7 @@ fn validate_user_agent(headers: &HeaderMap, config: &SecurityConfig) -> AppResul
                     "Suspicious user agent detected: {} (pattern: {})",
                     user_agent, pattern
                 );
-                return Err(AppError::BadRequest {
-                    message: "Invalid user agent".to_string(),
-                });
+                return Err(AppError::BadRequest("Invalid user agent".to_string()));
             }
         }
     }
@@ -346,9 +336,7 @@ fn validate_ip_address(headers: &HeaderMap, config: &SecurityConfig) -> AppResul
         // Check against blocked IPs
         if config.blocked_ips.contains(&ip) {
             warn!("Blocked IP address detected: {}", ip);
-            return Err(AppError::Forbidden {
-                message: "Access denied".to_string(),
-            });
+            return Err(AppError::Forbidden("Access denied".to_string()));
         }
         
         // Check for private IP ranges in production
@@ -394,9 +382,7 @@ fn validate_http_method(method: &Method) -> AppResult<()> {
     
     if !allowed_methods.contains(method) {
         warn!("Unusual HTTP method detected: {}", method);
-        return Err(AppError::BadRequest {
-            message: "Method not allowed".to_string(),
-        });
+        return Err(AppError::BadRequest("Method not allowed".to_string()));
     }
     
     Ok(())
@@ -422,9 +408,7 @@ fn validate_headers(headers: &HeaderMap) -> AppResult<()> {
                         "Suspicious header value detected: {}: {}",
                         header_name, value_str
                     );
-                    return Err(AppError::BadRequest {
-                        message: "Invalid header value".to_string(),
-                    });
+                    return Err(AppError::BadRequest("Invalid header value".to_string()));
                 }
             }
         }
@@ -486,9 +470,7 @@ fn validate_xss_in_string(input: &str, context: &str) -> AppResult<()> {
                 "XSS attempt detected in {}: {} (pattern: {})",
                 context, input, pattern
             );
-            return Err(AppError::BadRequest {
-                message: format!("Invalid characters in {}", context),
-            });
+            return Err(AppError::BadRequest(format!("Invalid characters in {}", context)));
         }
     }
     
@@ -531,9 +513,7 @@ pub async fn content_type_validation_middleware(
             }
         } else {
             // Require content type for requests with body
-            return Err(AppError::BadRequest {
-                message: "Content-Type header required".to_string(),
-            });
+            return Err(AppError::BadRequest("Content-Type header required".to_string()));
         }
     }
     
@@ -559,9 +539,7 @@ fn validate_content_type(content_type: &str) -> AppResult<()> {
     }
     
     warn!("Invalid content type: {}", content_type);
-    Err(AppError::BadRequest {
-        message: "Unsupported content type".to_string(),
-    })
+    Err(AppError::BadRequest("Unsupported content type".to_string()))
 }
 
 /// Create development security configuration (less restrictive)
