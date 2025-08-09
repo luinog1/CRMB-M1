@@ -375,13 +375,12 @@ impl AuthService {
         let exp = now + self.jwt_config.access_token_expiry;
         
         let claims = TokenClaims {
-            user_id: user.id,
+            sub: user.id.to_string(),
             username: user.username.clone(),
             email: user.email.clone(),
-            iat: now.as_secs(),
-            exp: exp.as_secs(),
-            iss: self.jwt_config.issuer.clone(),
-            aud: self.jwt_config.audience.clone(),
+            iat: now.as_secs() as i64,
+            exp: exp.as_secs() as i64,
+            jti: Uuid::new_v4().to_string(),
         };
 
         let header = Header::new(self.jwt_config.algorithm);
@@ -399,11 +398,12 @@ impl AuthService {
         let exp = now + self.jwt_config.refresh_token_expiry;
         
         let claims = RefreshTokenClaims {
-            user_id: user.id,
-            token_id: Uuid::new_v4().to_string(),
-            iat: now.as_secs(),
-            exp: exp.as_secs(),
-            iss: self.jwt_config.issuer.clone(),
+            sub: user.id.to_string(),
+            jti: Uuid::new_v4().to_string(),
+            iat: now.as_secs() as i64,
+            exp: exp.as_secs() as i64,
+            iss: Some(self.jwt_config.issuer.clone()),
+            token_type: "refresh".to_string(),
         };
 
         let header = Header::new(self.jwt_config.algorithm);
@@ -634,7 +634,7 @@ mod tests {
         let access_token = auth_service.generate_access_token(&user).unwrap();
         let claims = auth_service.decode_access_token(&access_token).unwrap();
         
-        assert_eq!(claims.user_id, user.id);
+        assert_eq!(claims.sub, user.id.to_string());
         assert_eq!(claims.username, user.username);
         assert_eq!(claims.email, user.email);
     }

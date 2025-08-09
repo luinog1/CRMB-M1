@@ -48,9 +48,16 @@ use crate::{
     error::{AppError, AppResult},
     handlers::{
         auth::{login, register, refresh_token, logout, change_password},
+        enhanced_metadata::{
+            enhanced_search, get_enhanced_by_tmdb_id, get_user_watchlists, get_mdblist_list,
+            get_mdblist_trending, mdblist_health, enhanced_metadata_health, get_api_docs,
+        },
         health::health_check,
         movies::{get_movie, search_movies, get_trending_movies, get_popular_movies, discover_movies},
         stremio::{get_manifest, get_catalog, get_meta, get_streams},
+        stremio_mdblist::{
+            mdblist_manifest, mdblist_catalog, get_stremio_config,
+        },
         tv::{get_tv_show, search_tv_shows, get_trending_tv, get_popular_tv, discover_tv},
         user::{
             get_profile, update_profile, get_watchlist, add_to_watchlist,
@@ -73,6 +80,8 @@ use crate::{
         stremio::StremioService,
         tmdb::TmdbService,
         Services,
+        mdblist::MdbListService,
+        enhanced_metadata::EnhancedMetadataService,
     },
 };
 
@@ -96,7 +105,7 @@ async fn main() -> AppResult<()> {
     info!("Configuration loaded successfully");
     
     // Initialize database
-    let database = Arc::new(Database::new(&config.database).await?);
+    let database = Arc::new(Database::new(&config.database_url).await?);
     info!("Database connection established");
     
     // Run database migrations
@@ -160,12 +169,15 @@ async fn initialize_services(config: &AppConfig) -> AppResult<Services> {
         .build()
         .map_err(|e| AppError::Internal(format!("Failed to create HTTP client: {}", e)))?;
     
+    // Initialize database
+        let database = Arc::new(Database::new(&config.database_url).await?);
+    
     // Initialize services using the Services::new constructor
     let services = Services::new(
         config,
         http_client,
         database.clone(),
-    ).await?;
+    );
     
     info!("All services initialized successfully");
     Ok(services)
@@ -257,6 +269,16 @@ fn create_api_routes() -> Router<AppState> {
         .route("/user/preferences", put(update_preferences).layer(middleware::from_fn(require_auth)))
         .route("/user/account", delete(delete_account).layer(middleware::from_fn(require_auth)))
         
+        // Enhanced metadata routes
+        .route("/enhanced/search", get(enhanced_search).layer(middleware::from_fn(optional_auth)))
+        .route("/enhanced/:type/:id", get(get_enhanced_by_tmdb_id).layer(middleware::from_fn(optional_auth)))
+        .route("/mdblist/user-lists", get(get_user_watchlists).layer(middleware::from_fn(optional_auth)))
+        .route("/mdblist/lists/:id", get(get_mdblist_list).layer(middleware::from_fn(optional_auth)))
+        .route("/mdblist/trending", get(get_mdblist_trending).layer(middleware::from_fn(optional_auth)))
+        .route("/mdblist/health", get(mdblist_health))
+        .route("/enhanced/health", get(enhanced_metadata_health))
+        .route("/docs", get(get_api_docs))
+        
         // Movie routes
         .route("/movies/search", get(search_movies).layer(middleware::from_fn(optional_auth)))
         .route("/movies/trending", get(get_trending_movies).layer(middleware::from_fn(optional_auth)))
@@ -275,19 +297,18 @@ fn create_api_routes() -> Router<AppState> {
 /// Create Stremio addon routes
 fn create_stremio_routes() -> Router<AppState> {
     Router::new()
-        // Addon manifest
+        // Original Stremio addon endpoints
         .route("/manifest.json", get(get_manifest))
-        
-        // Catalog endpoints
         .route("/catalog/:type/:id.json", get(get_catalog))
         .route("/catalog/:type/:id/:extra.json", get(get_catalog))
-        
-        // Meta endpoints
         .route("/meta/:type/:id.json", get(get_meta))
-        
-        // Stream endpoints
         .route("/stream/:type/:id.json", get(get_streams))
         .route("/stream/:type/:id/:extra.json", get(get_streams))
+        
+        // MDBList Stremio addon endpoints
+        .route("/mdblist/manifest.json", get(mdblist_manifest))
+        .route("/mdblist/catalog/:type/:id.json", get(mdblist_catalog))
+        .route("/mdblist/config", get(get_stremio_config))
 }
 
 /// Graceful shutdown signal handler

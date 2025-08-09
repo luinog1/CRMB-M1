@@ -1,7 +1,9 @@
 pub mod auth;
+pub mod enhanced_metadata;
 pub mod health;
 pub mod movies;
 pub mod stremio;
+pub mod stremio_mdblist;
 pub mod tmdb;
 pub mod tv;
 pub mod user;

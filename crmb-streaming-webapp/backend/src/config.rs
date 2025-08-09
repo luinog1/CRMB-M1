@@ -7,6 +7,8 @@ pub struct AppConfig {
     pub database_url: String,
     pub tmdb_api_key: String,
     pub tmdb_base_url: String,
+    pub mdblist_api_key: String,
+    pub mdblist_base_url: String,
     pub jwt_secret: String,
     pub jwt_expiration: i64,
     pub cors_origins: Vec<String>,
@@ -32,6 +34,12 @@ impl AppConfig {
 
         let tmdb_base_url = env::var("TMDB_BASE_URL")
             .unwrap_or_else(|_| "https://api.themoviedb.org/3".to_string());
+
+        let mdblist_api_key = env::var("MDBLIST_API_KEY")
+            .context("MDBLIST_API_KEY environment variable is required")?;
+
+        let mdblist_base_url = env::var("MDBLIST_BASE_URL")
+            .unwrap_or_else(|_| "https://mdblist.com/api".to_string());
 
         let jwt_secret = env::var("JWT_SECRET")
             .unwrap_or_else(|_| {
@@ -73,6 +81,8 @@ impl AppConfig {
             database_url,
             tmdb_api_key,
             tmdb_base_url,
+            mdblist_api_key,
+            mdblist_base_url,
             jwt_secret,
             jwt_expiration,
             cors_origins,

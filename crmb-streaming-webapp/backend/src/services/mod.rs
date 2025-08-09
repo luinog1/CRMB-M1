@@ -12,6 +12,8 @@ pub mod stremio;
 pub mod cache;
 pub mod rate_limiter;
 pub mod auth;
+pub mod mdblist;
+pub mod enhanced_metadata;
 
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -20,6 +22,7 @@ use tokio::sync::RwLock;
 #[derive(Clone)]
 pub struct Services {
     pub tmdb: Arc<tmdb::TmdbService>,
+    pub mdblist: Arc<mdblist::MdbListService>,
     pub stremio: Arc<stremio::StremioService>,
     pub cache: Arc<cache::CacheService>,
     pub rate_limiter: Arc<RwLock<rate_limiter::RateLimiter>>,
@@ -30,7 +33,7 @@ impl Services {
     /// Create new services container from AppConfig
     pub fn new(
         config: &crate::config::AppConfig,
-        http_client: reqwest::Client,
+        _http_client: reqwest::Client,
         database: Arc<crate::database::Database>,
     ) -> Self {
         let cache = Arc::new(cache::CacheService::new());
@@ -39,6 +42,10 @@ impl Services {
             config,
             cache.clone(),
         ).expect("Failed to create TMDB service"));
+        let mdblist = Arc::new(mdblist::MdbListService::new(
+            config,
+            cache.clone(),
+        ).expect("Failed to create MDBList service"));
         let stremio = Arc::new(stremio::StremioService::new(
             tmdb.clone(),
             cache.clone(),
@@ -48,6 +55,7 @@ impl Services {
 
         Self {
             tmdb,
+            mdblist,
             stremio,
             cache,
             rate_limiter,

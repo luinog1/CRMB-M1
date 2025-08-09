@@ -3,6 +3,7 @@ pub mod api;
 pub mod user;
 pub mod tmdb;
 pub mod stremio;
+pub mod mdblist;
 
 use serde::{Deserialize, Serialize};
 

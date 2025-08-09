@@ -95,13 +95,14 @@ pub struct ChangePasswordRequest {
     pub confirm_new_password: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RefreshTokenClaims {
     pub sub: String, // User ID
     pub exp: i64, // Expiration timestamp
     pub iat: i64, // Issued at timestamp
     pub jti: String, // JWT ID for token tracking
     pub token_type: String, // "refresh"
+    pub iss: Option<String>, // Issuer
 }
 
 #[derive(Debug, Serialize)]
@@ -149,6 +150,18 @@ pub enum AuthError {
     
     #[error("Validation error: {0}")]
     ValidationError(String),
+    
+    #[error("Weak password: {0}")]
+    WeakPassword(String),
+    
+    #[error("Token generation failed")]
+    TokenGenerationFailed,
+    
+    #[error("Password hashing failed")]
+    PasswordHashingFailed,
+    
+    #[error("Password verification failed")]
+    PasswordVerificationFailed,
 }
 
 impl From<bcrypt::BcryptError> for AuthError {

@@ -164,7 +164,7 @@ impl StremioService {
                 },
             ],
             resources: vec!["catalog".to_string(), "meta".to_string(), "stream".to_string()],
-            id_prefixes: vec!["tt".to_string()],
+            id_prefixes: Some(vec!["tt".to_string()]),
         };
 
         let config = StremioConfig {
