@@ -35,6 +35,19 @@ export interface TMDBTVShow {
   popularity: number
 }
 
+export interface TVEpisode {
+  id: number
+  name: string
+  overview: string
+  vote_average: number
+  vote_count: number
+  air_date: string
+  episode_number: number
+  season_number: number
+  runtime: number
+  still_path: string | null
+}
+
 export interface TMDBPerson {
   id: number
   name: string

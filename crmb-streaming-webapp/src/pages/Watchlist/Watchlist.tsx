@@ -1,4 +1,4 @@
-export const Watchlist = () => {
+const Watchlist = () => {
   return (
     <div className="watchlist-page">
       <h1>Watchlist</h1>
@@ -6,3 +6,5 @@ export const Watchlist = () => {
     </div>
   )
 }
+
+export default Watchlist

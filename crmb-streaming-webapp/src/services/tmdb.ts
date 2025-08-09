@@ -200,6 +200,11 @@ class TMDBService {
     return this.rateLimitedRequest<PaginatedResponse<TMDBPerson>>(`/search/person?query=${encodedQuery}&page=${page}`)
   }
 
+  // TV Episodes
+  async getTVEpisodeDetails(tvId: number, seasonNumber: number, episodeNumber: number): Promise<TVEpisode> {
+    return this.rateLimitedRequest<TVEpisode>(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`)
+  }
+
   // Utility methods
   isValidImagePath(path: string | null): boolean {
     return path !== null && path.length > 0 && path.startsWith('/')

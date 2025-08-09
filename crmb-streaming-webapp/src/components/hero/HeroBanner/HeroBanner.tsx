@@ -1,6 +1,7 @@
 import React from 'react'
 import './HeroBanner.css'
 import { useHeroBanner } from '../../../hooks/useHeroBanner'
+import { Play, Plus, ChevronLeft, ChevronRight, Star, RefreshCw } from 'lucide-react'
 
 interface HeroBannerProps {
   contentSource?: 'trending' | 'popular' | 'upcoming'
@@ -46,11 +47,15 @@ const HeroBanner = ({
   if (isLoading) {
     return (
       <div className="hero-section hero-loading">
+        <div className="hero-overlay"></div>
         <div className="container">
-          <div className="hero-skeleton">
-            <div className="skeleton-title"></div>
-            <div className="skeleton-description"></div>
-            <div className="skeleton-buttons"></div>
+          <div className="hero-content">
+            <div className="hero-skeleton">
+              <div className="skeleton-title"></div>
+              <div className="skeleton-description"></div>
+              <div className="skeleton-description" style={{ width: '80%' }}></div>
+              <div className="skeleton-buttons"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -60,17 +65,18 @@ const HeroBanner = ({
   if (error) {
     return (
       <div className="hero-section hero-error">
+        <div className="hero-overlay"></div>
         <div className="container">
-          <h1 className="hero-title">CRUMBLE</h1>
-          <p className="hero-description error-message">
-            Unable to load featured content. Please check your connection.
-          </p>
-          <button className="start-watching-btn" onClick={refreshContent}>
-            <svg fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-            </svg>
-            Try Again
-          </button>
+          <div className="hero-content">
+            <h1 className="hero-title">CRUMBLE</h1>
+            <p className="hero-description error-message">
+              Unable to load featured content. Please check your connection.
+            </p>
+            <button className="start-watching-btn" onClick={refreshContent}>
+              <RefreshCw size={20} />
+              Try Again
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -106,18 +112,19 @@ const HeroBanner = ({
           <h1 className="hero-title">{currentContent.title}</h1>
           
           <div className="hero-meta">
-             {releaseYear && <span className="hero-year">{releaseYear}</span>}
-             {currentContent.rating && (
-               <span className="hero-rating">
-                 ⭐ {currentContent.rating}
-               </span>
-             )}
-             {currentContent.mediaItem.genres && currentContent.mediaItem.genres.length > 0 && (
-               <span className="hero-genres">
-                 {currentContent.mediaItem.genres.slice(0, 3).join(' • ')}
-               </span>
-             )}
-           </div>
+            {releaseYear && <span className="hero-year">{releaseYear}</span>}
+            {currentContent.rating && (
+              <span className="hero-rating">
+                <Star size={16} style={{ display: 'inline-block', marginRight: '4px' }} />
+                {currentContent.rating}
+              </span>
+            )}
+            {currentContent.mediaItem.genres && currentContent.mediaItem.genres.length > 0 && (
+              <span className="hero-genres">
+                {currentContent.mediaItem.genres.slice(0, 3).join(' • ')}
+              </span>
+            )}
+          </div>
            
            {currentContent.description && (
              <p className="hero-description">
@@ -129,17 +136,13 @@ const HeroBanner = ({
            )}
           
           <div className="hero-actions">
-            <button className="start-watching-btn primary" onClick={handleStartWatching}>
-              <svg fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
+            <button className="start-watching-btn primary" onClick={handleStartWatching} aria-label={`Watch ${currentContent.title}`}>
+              <Play size={20} />
               {currentContent.mediaItem.type === 'movie' ? 'Watch Now' : 'Start Watching'}
             </button>
             
-            <button className="start-watching-btn secondary" onClick={handleAddToWatchlist}>
-              <svg fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-              </svg>
+            <button className="start-watching-btn secondary" onClick={handleAddToWatchlist} aria-label={`Add ${currentContent.title} to watchlist`}>
+              <Plus size={20} />
               Add to List
             </button>
           </div>
@@ -151,9 +154,7 @@ const HeroBanner = ({
                 onClick={previousContent}
                 aria-label="Previous content"
               >
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-                </svg>
+                <ChevronLeft size={24} />
               </button>
               
               <button 
@@ -161,9 +162,7 @@ const HeroBanner = ({
                 onClick={nextContent}
                 aria-label="Next content"
               >
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-                </svg>
+                <ChevronRight size={24} />
               </button>
             </div>
           )}

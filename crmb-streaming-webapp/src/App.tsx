@@ -1,35 +1,36 @@
-import Sidebar from './components/common/Sidebar/Sidebar.tsx'
-import SearchBar from './components/common/SearchBar/SearchBar.tsx'
-import HeroBanner from './components/hero/HeroBanner/HeroBanner.tsx'
-import ContentSection from './components/carousel/ContentSection/ContentSection.tsx'
-import './styles/global.css'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import Layout from './components/Layout/Layout'
+import Home from './pages/Home/Home'
+import Search from './pages/Search/Search'
+import Settings from './pages/Settings/Settings'
+import Watchlist from './pages/Watchlist/Watchlist'
+import MovieDetail from './pages/MovieDetail/MovieDetail'
+import EpisodeDetail from './pages/EpisodeDetail/EpisodeDetail'
+import NotFound from './pages/NotFound/NotFound'
+import './App.css'
 
 function App() {
   return (
-    <div className="app">
-      <Sidebar />
-      <div className="main-content">
-        <header className="header">
-          <div className="container">
-            <SearchBar />
-          </div>
-        </header>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Home />} />
+        <Route path="search" element={<Search />} />
+        <Route path="watchlist" element={<Watchlist />} />
+        <Route path="settings" element={<Settings />} />
         
-        <HeroBanner />
+        {/* Content Detail Routes */}
+        <Route path="movie/:movieId" element={<MovieDetail />} />
+        <Route path="tv/:tvId" element={<MovieDetail />} />
+        <Route path="tv/:tvId/season/:seasonNumber/episode/:episodeNumber" element={<EpisodeDetail />} />
         
-        <ContentSection 
-          title="Up Next" 
-          type="episodes"
-          showSeeAll={true}
-        />
+        {/* Redirect old routes */}
+        <Route path="movies/:movieId" element={<Navigate to="/movie/:movieId" replace />} />
+        <Route path="shows/:tvId" element={<Navigate to="/tv/:tvId" replace />} />
         
-        <ContentSection 
-          title="Movies - Popular" 
-          type="movies"
-          showSeeAll={true}
-        />
-      </div>
-    </div>
+        {/* 404 Catch-all */}
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
   )
 }
 
